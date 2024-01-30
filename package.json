@@ -1,0 +1,17 @@
+{
+  "name": "range-datetime-picker",
+  "version": "1.0.0",
+  "description": "Range Date time picker",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "web-dev-server",
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC",
+  "types": "src/elements.d.ts",
+  "devDependencies": {
+    "@web/dev-server": "^0.4.1"
+  }
+}

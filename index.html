@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Range Datetime Picker</title>
+    <script type="module" src="./index.js"></script>
+</head>
+<body>
+    <div>
+        <header>
+            <h1>Range Datetime Picker</h1>
+        </header>
+        <main>
+            <section>
+                <h2>Default Style</h2>
+                <date-picker-inline></date-picker-inline>
+            </section>
+            <section>
+                <h2>OeyPay Style</h2>
+                <date-picker-inline
+                    style="
+                        --si-width: 315px;
+                        --si-cell-selected-bg-color: #FFBE00;
+                        --si-cell-selected-text-color: #FFFFFF;
+                        --si-cell-weekend-text-color: #999999;
+                        --si-cell-other-month-weekend-text-color: #999999;
+                    "
+                >
+                    <date-picker-month-view
+                        slot="month-select"
+                        default-text="-"
+                    ></date-picker-month-view>
+                    <date-picker-year-view
+                        slot="year-input"
+                        default-text="-"
+                    ></date-picker-year-view>
+                </date-picker-inline>
+            </section>
+            <section>
+                <h2>Input Date Picker Default Style</h2>
+                <date-picker open></date-picker>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
