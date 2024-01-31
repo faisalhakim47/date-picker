@@ -1,10 +1,12 @@
+// @ts-check
+
 /**
- * @typedef {object} DateEventDetail
+ * @typedef {object} DateRelatedEventDetail
  * @property {Date} date
  */
 
 /**
- * @extends {CustomEvent<DateEventDetail>}
+ * @extends {CustomEvent<DateRelatedEventDetail>}
  */
 export class DateRelatedEvent extends CustomEvent {
   /** @type {Date} */
@@ -13,7 +15,7 @@ export class DateRelatedEvent extends CustomEvent {
   /**
    * @param {string} type
    * @param {Date} date
-   * @param {CustomEventInit<DateEventDetail>} [options]
+   * @param {CustomEventInit<DateRelatedEventDetail>} [options]
    */
   constructor(type, date, options) {
     super(type, {

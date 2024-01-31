@@ -1,9 +1,17 @@
+// @ts-check
+
 import { tx } from './helper.js';
 import { ContextAwareElement } from './context-aware-element.js';
 import { YearMonthViewChangeEvent } from './events/year-month-view-change-event.js';
 import { DatePickerViewElement } from './date-picker-view-element.js';
 
 export class DatePickerYearViewElement extends ContextAwareElement {
+  static get requiredContexts() {
+    return [
+      DatePickerViewElement,
+    ];
+  }
+
   /** @type {ShadowRoot} */
   #shadowRoot;
 
@@ -16,14 +24,17 @@ export class DatePickerYearViewElement extends ContextAwareElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
+
     this.#render();
+
     this.getContext(DatePickerViewElement)
-      .addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
+      ?.addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
   }
 
   disconnectedCallback() {
     this.getContext(DatePickerViewElement)
-      .removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
+      ?.removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
   }
 
   /**

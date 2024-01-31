@@ -1,5 +1,9 @@
+// @ts-check
+
 import { ContextAwareElement } from './context-aware-element.js';
 import { DateValueChangeEvent } from './events/date-value-change-event.js';
+
+// @ts-check
 
 export class DatePickerControlElement extends ContextAwareElement {
   static formAssociated = true;
@@ -16,10 +20,28 @@ export class DatePickerControlElement extends ContextAwareElement {
    * @param {string} value date iso string
    */
   set value(value) {
-    this.#date = new Date(value);
-    this.#internals.setFormValue(this.#date.toISOString());
-    const event = DateValueChangeEvent(this.#date);
-    this.dispatchEvent(event);
+    const newDate = new Date(value);
+    const isInvalidDate = (value === null || isNaN(newDate.getTime()))
+      ? true
+      : false;
+    if (isInvalidDate) {
+      this.#date = null;
+      this.#internals.setFormValue('');
+      const event = new DateValueChangeEvent(null);
+      this.dispatchEvent(event);
+    }
+    else {
+      this.#date = newDate;
+      this.#internals.setFormValue(newDate.toISOString());
+      const event = new DateValueChangeEvent(newDate);
+      this.dispatchEvent(event);
+    }
+  }
+
+  get dateValue() {
+    return this.#date instanceof Date
+      ? new Date(this.#date)
+      : null;
   }
 
   get form() {

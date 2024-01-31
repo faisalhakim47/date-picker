@@ -1,6 +1,7 @@
 // @ts-check
 
 import './src/index.js';
+import { DatePickerElement, DatePickerSubmitEvent } from './src/index.js';
 
 // import { DatePickerInlineElement } from './src/index.js';
 
@@ -28,4 +29,39 @@ import './src/index.js';
 //   div.appendChild(document.createElement('date-picker-year-view'));
 
 //   datePicker.appendChild(div);
+// });
+
+
+// window.addEventListener('load', function () {
+//   setInterval(function () {
+//     const datePicker = document.querySelector('date-picker');
+//     if (datePicker?.hasAttribute('open')) {
+//       datePicker?.removeAttribute('open');
+//     }
+//     else {
+//       datePicker?.setAttribute('open', 'open');
+//     }
+//   }, 1000);
+// });
+
+
+// window.addEventListener('load', function () {
+//   const datePicker = document.querySelector('date-picker');
+//   const datePickerSubmitButton = document.querySelector('date-picker button[type="submit"]');
+
+//   if (!(datePickerSubmitButton instanceof HTMLButtonElement)) {
+//     throw new Error('The element is not an instance of HTMLButtonElement.');
+//   }
+
+//   datePickerSubmitButton.addEventListener('click', function () {
+//     if (! (datePicker instanceof DatePickerElement)) {
+//       throw new Error('The element is not an instance of HTMLDialogElement.');
+//     }
+
+//     if (!(datePickerSubmitButton instanceof HTMLButtonElement)) {
+//       throw new Error('The element is not an instance of HTMLButtonElement.');
+//     }
+
+//     datePicker.requestSubmit();
+//   });
 // });

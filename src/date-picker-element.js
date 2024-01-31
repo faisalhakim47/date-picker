@@ -3,8 +3,46 @@
 import './date-picker-view.js';
 import { DatePickerControlElement } from './date-picker-control-element.js';
 import { at, el, on, tx } from './helper.js';
+import { SelectedDateSetEvent } from './events/selected-date-set-event.js';
+import { DatePickerViewElement } from './date-picker-view-element.js';
 
 export class DatePickerElement extends DatePickerControlElement {
+  static #STYLES = (function () {
+    const style = new CSSStyleSheet();
+
+    style.replace(`
+:host {
+  --si-input-button-height: 36px;
+  --si-submit-button-height: 36px;
+  --si-dialog-radius: 4px;
+  --si-dialog-padding: 16px;
+}
+button {
+  display: block;
+  padding: 0 8px;
+  height: var(--si-input-button-height);
+}
+dialog {
+  border: none;
+  padding: var(--si-dialog-padding);
+  border-radius: var(--si-dialog-radius);
+}
+dialog > form > slot > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+dialog > form > slot > div > button {
+  display: block;
+  padding: 0 8px;
+  height: var(--si-submit-button-height);
+}
+    `);
+
+    return [style];
+  })();
+
   static get formAssociated() {
     return true;
   }
@@ -25,19 +63,67 @@ export class DatePickerElement extends DatePickerControlElement {
   /** @type {HTMLDialogElement} */
   #dialog;
 
+  /** @type {HTMLFormElement} */
+  #form;
+
+  /** @type {HTMLSlotElement} */
+  #datePickerControlsSlot;
+
+  /** @type {HTMLSlotElement} */
+  #datePickerViewSlot;
+
+  /** @type {HTMLSlotElement} */
+  #formControlsSlot;
+
+  /** @type {Date} */
+  #selectedDate;
+
   constructor() {
     super();
 
-    this.#shadowRoot = this.attachShadow({
-      mode: 'closed',
-      slotAssignment: 'manual',
-    });
+    this.#shadowRoot = this.attachShadow({ mode: 'closed' });
   }
 
   connectedCallback() {
-    this.#attachStyle();
+    super.connectedCallback();
+
+    this.#shadowRoot.adoptedStyleSheets = DatePickerElement.#STYLES;
+
     this.#render();
-    this.#syncOpenAttributeFromParent();
+
+    this.addEventListener(SelectedDateSetEvent.EVENT_TYPE, this.#handleSelectedDateSet);
+
+    this.#dialog.addEventListener('open', this.#handleDialogOpen);
+    this.#dialog.addEventListener('close', this.#handleDialogClose);
+
+    if (this.hasAttribute('open')) {
+      this.#openDatePicker();
+    }
+    else {
+      this.#closeDatePicker();
+    }
+
+    if (this.hasAttribute('value')) {
+      const value = this.getAttribute('value');
+      const dateValue = new Date(value);
+      const isInvalidDate = (value === null || isNaN(dateValue.getTime()));
+      if (isInvalidDate) {
+        this.value = null;
+      }
+      else {
+        this.value = dateValue.toISOString();
+      }
+    }
+
+    this.#updateButtonText();
+    this.#applySelectedDateToDatePickerView();
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener(SelectedDateSetEvent.EVENT_TYPE, this.#handleSelectedDateSet);
+
+    this.#dialog.removeEventListener('open', this.#handleDialogOpen);
+    this.#dialog.removeEventListener('close', this.#handleDialogClose);
   }
 
   /**
@@ -47,35 +133,60 @@ export class DatePickerElement extends DatePickerControlElement {
    */
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'open') {
-      this.#syncOpenAttributeFromChild();
+      if (newValue === null) {
+        this.#closeDatePicker();
+      }
+      else {
+        this.#openDatePicker();
+      }
     }
     else if (name === 'value') {
       this.value = newValue;
-      this.#buttonText.nodeValue = `Selected Date: ${this.value}`;
+      if (this.#buttonText instanceof Text) {
+        this.#buttonText.nodeValue = `Selected Date: ${this.value}`;
+      }
     }
   }
 
-  #syncOpenAttributeFromChild = () => {
-    if (this.#dialog instanceof HTMLDialogElement) {
-      if (this.#dialog.open) {
-        this.setAttribute('open', 'open');
-      } else {
-        this.removeAttribute('open');
+  /**
+   * @param {HTMLElement} [submitter]
+   */
+  requestSubmit = (submitter) => {
+    this.#form.requestSubmit(submitter);
+
+    this.value = this.#selectedDate instanceof Date
+      ? this.#selectedDate.toISOString()
+      : null;
+
+    this.#updateButtonText();
+  };
+
+  closeDatePicker() {
+    this.#closeDatePicker();
+  }
+
+  #updateButtonText() {
+    if (this.dateValue instanceof Date) {
+      if (this.#buttonText instanceof Text) {
+        this.#buttonText.nodeValue = `Selected Date: ${this.value}`;
       }
     }
-  };
-
-  #syncOpenAttributeFromParent = () => {
-    if (this.hasAttribute('open')) {
-      this.#openDatePicker();
-    } else {
-      this.#closeDatePicker();
+    else {
+      if (this.#buttonText instanceof Text) {
+        this.#buttonText.nodeValue = 'Select Date';
+      }
     }
-  };
+  }
 
   #openDatePicker = () => {
+    this.#applySelectedDateToDatePickerView();
+
     if (this.#dialog instanceof HTMLDialogElement) {
       this.#dialog.showModal();
+
+      if (!this.hasAttribute('open')) {
+        this.setAttribute('open', '');
+      }
     }
   };
 
@@ -85,66 +196,104 @@ export class DatePickerElement extends DatePickerControlElement {
     }
   };
 
-  #attachStyle() {
-    this.#shadowRoot.appendChild(el('style', [
-      (style) => style.textContent = `
-        :host {
-          --si-input-button-height: 36px;
-          --si-submit-button-height: 36px;
-          --si-dialog-radius: 4px;
-          --si-dialog-padding: 16px;
+  #handleDialogOpen = () => {
+    if (!this.hasAttribute('open')) {
+      this.setAttribute('open', '');
+    }
+  };
+
+  #handleDialogClose = () => {
+    if (this.hasAttribute('open')) {
+      this.removeAttribute('open');
+    }
+  };
+
+  /**
+   * @param {SelectedDateSetEvent} event
+   */
+  #handleSelectedDateSet = (event) => {
+    if (event instanceof SelectedDateSetEvent) {
+      this.#selectedDate = event.date;
+    }
+  };
+
+  /**
+   * @param {Event} event
+   */
+  #handleFormSubmit = (event) => {
+    const target = event.target;
+
+    /** @type {HTMLElement} */
+    let submitButton;
+
+    if (target instanceof HTMLButtonElement) {
+      if (target.type === 'submit') {
+        submitButton = target;
+      }
+    }
+
+    if (target instanceof HTMLInputElement) {
+      if (target.type === 'submit') {
+        submitButton = target;
+      }
+    }
+
+    this.requestSubmit(submitButton);
+  };
+
+  #applySelectedDateToDatePickerView() {
+    if (this.#datePickerViewSlot instanceof HTMLSlotElement) {
+      for (const assignedElement of this.#datePickerViewSlot.assignedElements()) {
+        const treeWalker = document.createTreeWalker(
+          assignedElement,
+          NodeFilter.SHOW_ELEMENT,
+          {
+            acceptNode(node) {
+              if (node instanceof DatePickerViewElement) {
+                return NodeFilter.FILTER_ACCEPT;
+              }
+              return NodeFilter.FILTER_REJECT;
+            },
+          },
+        );
+        let datePickerViewElement = treeWalker.currentNode;
+        while (datePickerViewElement instanceof DatePickerViewElement) {
+          datePickerViewElement.setSelectedDate(this.dateValue);
+          datePickerViewElement = treeWalker.nextNode();
         }
-        button {
-          display: block;
-          padding: 0 8px;
-          height: var(--si-input-button-height);
-        }
-        dialog {
-          border: none;
-          padding: var(--si-dialog-padding);
-          border-radius: var(--si-dialog-radius);
-        }
-        dialog > form > div {
-          display: flex;
-          justify-content: flex-end;
-          gap: 8px;
-        }
-        dialog > form > div > button {
-          display: block;
-          padding: 0 8px;
-          height: var(--si-submit-button-height);
-        }
-      `,
-    ]));
-  }
+      }
+    }
+  };
 
   #render() {
     this.#shadowRoot.appendChild(el('div', [
-      el('slot', [
+      this.#datePickerControlsSlot = el('slot', [
+        at('name', 'date-picker-controls'),
         el('button', [
           on('click', this.#openDatePicker),
           this.#buttonText = tx('Select Date'),
         ]),
       ]),
       this.#dialog = el('dialog', [
-        el('form', [
+        this.#form = el('form', [
           at('method', 'dialog'),
-          on('submit', this.#closeDatePicker),
-          el('date-picker-view', [
-            el('slot', [
-              at('name', 'year-month-controls'),
-              at('slot', 'year-month-controls'),
-            ]),
+          on('submit', this.#handleFormSubmit),
+          this.#datePickerViewSlot = el('slot', [
+            at('name', 'date-picker-view'),
+            el('date-picker-view', []),
           ]),
-          el('div', [
-            el('button', [
-              at('type', 'button'),
-              on('click', this.#closeDatePicker),
-              tx('Cancel'),
-            ]),
-            el('button', [
-              at('type', 'submit'),
-              tx('Apply'),
+          this.#formControlsSlot = el('slot', [
+            at('name', 'form-controls'),
+            el('div', [
+              el('button', [
+                at('type', 'button'),
+                on('click', this.#closeDatePicker),
+                tx('Cancel'),
+              ]),
+              el('button', [
+                at('type', 'submit'),
+                tx('Apply'),
+              ]),
             ]),
           ]),
         ]),

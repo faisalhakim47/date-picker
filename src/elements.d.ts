@@ -1,3 +1,5 @@
+// @ts-check
+
 import { DatePickerElement } from './date-picker-element.js';
 import { DatePickerViewElement } from './date-picker-view-element.js';
 import { DatePickerYearViewElement } from './date-picker-year-view-element.js';

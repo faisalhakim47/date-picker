@@ -1,11 +1,209 @@
 // @ts-check
 
 import { ContextAwareElement } from './context-aware-element.js';
+import { DatePickerControlElement } from './date-picker-control-element.js';
+import { SelectedDateSetEvent } from './events/selected-date-set-event.js';
 import { YearMonthViewChangeEvent } from './events/year-month-view-change-event.js';
 import { at, el, on, tx } from './helper.js';
 
 export class DatePickerViewElement extends ContextAwareElement {
   static #ID_INC = 0;
+
+  static #STYLES = (function () {
+    const style = new CSSStyleSheet();
+
+    style.replace(`
+:host {
+  --si-width: 336px;
+  --si-calendar-label-margin: 8px;
+  --si-cell-size: calc(var(--si-width) / 7);
+  --si-cell-width: var(--si-cell-size);
+  --si-cell-height: var(--si-cell-size);
+  --si-cell-selected-bg-color: orange;
+  --si-cell-selected-text-color: white;
+  --si-cell-selected-font-weight: bold;
+  --si-cell-weekend-text-color: red;
+  --si-cell-other-month-text-color: silver;
+  --si-cell-other-month-weekend-text-color: tomato;
+  --si-cell-font-size: 16px;
+  --si-inner-cell-padding: 8px;
+  --si-inner-cell-size: min(
+    calc(var(--si-cell-width) - var(--si-inner-cell-padding)),
+    calc(var(--si-cell-height) - var(--si-inner-cell-padding))
+  );
+  --si-header-height: calc(var(--si-cell-size) - 4px);
+  --si-form-height: calc(
+      var(--si-header-height)
+      + var(--si-calendar-label-margin)
+      + var(--si-header-height)
+      + var(--si-calendar-label-margin)
+      + var(--si-cell-height)
+      + var(--si-cell-height)
+      + var(--si-cell-height)
+      + var(--si-cell-height)
+      + var(--si-cell-height)
+      + var(--si-cell-height)
+  );
+  --si-form-width: var(--si-width);
+  display: block;
+  font-family: sans-serif;
+  width: var(--si-width);
+  height: var(--si-form-height);
+}
+
+.sr-only {
+  display: none;
+  visibility: hidden;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--si-form-width);
+  height: var(--si-form-height);
+}
+
+form > header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: var(--si-header-height);
+}
+
+form > header > .year-month-pagination {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+form > header > .year-month-pagination > button {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: var(--si-cell-size);
+  height: var(--si-header-height);
+  margin: 0;
+  padding: 0;
+  border: var(--si-button-border, 1px solid none);
+  background-color: var(--si-button-bg-color, none);
+}
+
+form select[name="month"] {
+  box-sizing: border-box;
+  height: var(--si-header-height);
+  padding: 0 8px;
+}
+
+form input[name="year"] {
+  box-sizing: border-box;
+  display: block;
+  width: 96px;
+  height: var(--si-header-height);
+  padding: 0 8px;
+}
+
+form > table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: var(--si-width);
+}
+
+form > table,
+form > table > thead > tr > th,
+form > table > tbody > tr > td {
+  border: none;
+}
+
+form > table > thead > tr > th,
+form > table > thead > tr > th > span,
+form > table > tbody > tr > td,
+form > table > tbody > tr > td > label {
+  box-sizing: border-box;
+  width: var(--si-cell-width);
+  height: var(--si-cell-height);
+  padding: 0;
+  margin: 0;
+  font-size: var(--si-cell-font-size);
+}
+
+form > table > thead > tr > th > span {
+  -webkit-user-select: none;
+  user-select: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  margin-top: var(--si-calendar-label-margin);
+  margin-bottom: var(--si-calendar-label-margin);
+  font-weight: normal;
+}
+
+form > table > tbody > tr > td > label {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+form > table > tbody > tr > td > label > input {
+  display: none;
+  visibility: hidden;
+}
+
+form > table > tbody > tr > td > label > span {
+  -webkit-user-select: none;
+  user-select: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: var(--si-inner-cell-size);
+  height: var(--si-inner-cell-size);
+  border-radius: 50%;
+}
+
+form > table > tbody > tr > td > label > span > span {
+  display: block;
+  padding: 0;
+  margin: 0;
+  font-variant-numeric: normal;
+  line-height: 1;
+}
+
+form > table > tbody > tr > td > label:has(input:checked) > span {
+  background-color: var(--si-cell-selected-bg-color, orange);
+}
+
+form > table > tbody > tr > td > label:has(input:checked) > span > span {
+  color: var(--si-cell-selected-text-color, white);
+  font-weight: var(--si-cell-selected-font-weight, bold);
+}
+
+form > table > tbody > tr > td > label.weekend > span > span {
+  color: var(--si-cell-weekend-text-color);
+}
+
+form > table > tbody > tr > td > label.other-month > span > span {
+  color: var(--si-cell-other-month-text-color);
+}
+
+form > table > tbody > tr > td > label.other-month.weekend > span > span {
+  color: var(--si-cell-other-month-weekend-text-color);
+}
+    `);
+
+    return [
+      style,
+    ];
+  })();
 
   /** @type {number} */
   #idSufix;
@@ -39,37 +237,33 @@ export class DatePickerViewElement extends ContextAwareElement {
     this.#idSufix = DatePickerViewElement.#ID_INC++;
 
     this.#shadowRoot = this.attachShadow({ mode: 'closed' });
-
-    const now = new Date();
-
-    this.#selectedDate = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      0,
-      0,
-      0,
-      0,
-    )
   }
 
   connectedCallback() {
-    this.#attachStyle();
+    super.connectedCallback();
+
+    this.#shadowRoot.adoptedStyleSheets = DatePickerViewElement.#STYLES;
+
     this.#render();
 
     this.getContext(DatePickerViewElement)
-      .addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleYearMonthViewChange);
+      ?.addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleYearMonthViewChange);
+
     this.#yearMonthControlsSlot.addEventListener('slotchange', this.#handleSlotChange);
 
+    const defaultDate = this.#selectedDate instanceof Date
+      ? this.#selectedDate
+      : new Date();
+
     this.changeYearMonthView(
-      this.#selectedDate.getFullYear(),
-      this.#selectedDate.getMonth(),
+      defaultDate.getFullYear(),
+      defaultDate.getMonth(),
     );
   }
 
   disconnectedCallback() {
     this.getContext(DatePickerViewElement)
-      .removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleYearMonthViewChange);
+      ?.removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleYearMonthViewChange);
     this.#yearMonthControlsSlot.removeEventListener('slotchange', this.#handleSlotChange);
   }
 
@@ -130,6 +324,8 @@ export class DatePickerViewElement extends ContextAwareElement {
 
     let dayIndex = 0;
 
+    const selectedDateIsoString = this.#selectedDate?.toDateString();
+
     while (date.getTime() <= endOfWeekOfMonthDate.getTime() || weeksView.length <= 6) {
       const latestWeek = weeksView[weeksView.length - 1];
 
@@ -142,7 +338,7 @@ export class DatePickerViewElement extends ContextAwareElement {
       const isCurrMonth = (yearViewDiff + dateMonthIndex) === this.monthIndexView;
       const isPrevMonth = (yearViewDiff + dateMonthIndex) < this.monthIndexView;
       const isNextMonth = (yearViewDiff + dateMonthIndex) > this.monthIndexView;
-      const isToday = date.toDateString() === this.#selectedDate.toDateString();
+      const isToday = date.toDateString() === selectedDateIsoString;
       const isWeekend = dateDayIndex === 0 || dateDayIndex === 6;
 
       latestWeek.dates.push({
@@ -212,9 +408,9 @@ export class DatePickerViewElement extends ContextAwareElement {
   }
 
   /**
- * @param {number} year
- * @param {number} monthIndex
- */
+   * @param {number} year
+   * @param {number} monthIndex
+   */
   changeYearMonthView(year, monthIndex) {
     this.#yearView = year;
     this.#monthIndexView = monthIndex;
@@ -225,6 +421,28 @@ export class DatePickerViewElement extends ContextAwareElement {
       monthLabel,
     );
     this.dispatchEvent(event);
+  }
+
+  /**
+   * @param {Date} [date]
+   */
+  setSelectedDate(date) {
+    if (date instanceof Date) {
+      const isInvalidDate = isNaN(date.getTime());
+      this.#selectedDate = isInvalidDate ? null : new Date(date);
+    }
+    else {
+      this.#selectedDate = null;
+    }
+
+    const selectedDate = this.#selectedDate instanceof Date
+      ? this.#selectedDate
+      : new Date();
+
+    this.changeYearMonthView(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+    );
   }
 
   #viewPrevMonth() {
@@ -261,170 +479,14 @@ export class DatePickerViewElement extends ContextAwareElement {
    * @param {Date} date
    */
   #changeDate(date) {
-    if (this.#selectedDate.toDateString() === date.toDateString()) {
+    if (this.#selectedDate?.toDateString() === date.toDateString()) {
       return;
     }
 
     this.#selectedDate = new Date(date);
-  }
 
-  #attachStyle() {
-    this.#shadowRoot.appendChild(el('style', [
-      (style) => style.textContent = `
-        :host {
-          --si-width: 336px;
-          --si-cal-margin-top: 8px;
-          --si-header-height: calc(var(--si-cell-size) - 4px);
-          --si-cell-size: calc(var(--si-width) / 7);
-          --si-cell-internal-padding: 12px;
-          --si-cell-internal-size: calc(var(--si-cell-size) - var(--si-cell-internal-padding));
-          --si-cell-selected-bg-color: orange;
-          --si-cell-selected-text-color: white;
-          --si-cell-selected-font-weight: bold;
-          --si-cell-weekend-text-color: red;
-          --si-cell-other-month-text-color: silver;
-          --si-cell-other-month-weekend-text-color: tomato;
-          --si-form-height: calc(var(--si-header-height) + var(--si-cell-size) * 7 + var(--si-cal-margin-top));
-          --si-form-width: var(--si-width);
-          display: block;
-          font-family: sans-serif;
-          width: var(--si-width);
-          height: var(--si-form-height);
-        }
-
-        .sr-only {
-          display: none;
-          visibility: hidden;
-        }
-
-        form {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          width: var(--si-form-width);
-          height: var(--si-form-height);
-        }
-
-        form > header {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          height: var(--si-header-height);
-        }
-
-        form > header > .year-month-pagination {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-        }
-
-        form > header > .year-month-pagination > button {
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          width: var(--si-cell-size);
-          height: var(--si-header-height);
-          margin: 0;
-          padding: 0;
-          border: var(--si-button-border, 1px solid none);
-          background-color: var(--si-button-bg-color, none);
-        }
-
-        form select[name="month"] {
-          box-sizing: border-box;
-          height: var(--si-header-height);
-          padding: 0 8px;
-        }
-
-        form input[name="year"] {
-          box-sizing: border-box;
-          display: block;
-          width: 96px;
-          height: var(--si-header-height);
-          padding: 0 8px;
-        }
-
-        form > table {
-          width: var(--si-width);
-          margin-top: var(--si-cal-margin-top);
-          border-collapse: collapse;
-          border-spacing: 0;
-        }
-
-        form > table,
-        form > table > thead > tr > th,
-        form > table > tbody > tr > td {
-          border: none;
-        }
-
-        form > table > thead > tr > th,
-        form > table > tbody > tr > td,
-        form > table > tbody > tr > td > label {
-          box-sizing: border-box;
-          width: var(--si-cell-size);
-          height: var(--si-cell-size);
-          padding: 0;
-          margin: 0;
-        }
-
-        form > table > thead > tr > th {
-          -webkit-user-select: none;
-          user-select: none;
-          color: gray;
-          font-weight: normal;
-        }
-
-        form > table > tbody > tr > td > label {
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: center;
-        }
-
-        form > table > tbody > tr > td > label > input {
-          display: none;
-          visibility: hidden;
-        }
-
-        form > table > tbody > tr > td > label > span {
-          -webkit-user-select: none;
-          user-select: none;
-          font-variant-numeric: tabular-nums;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: center;
-          width: var(--si-cell-internal-size);
-          height: var(--si-cell-internal-size);
-          border-radius: 50%;
-        }
-
-        form > table > tbody > tr > td > label:has(input:checked) > span {
-          background-color: var(--si-cell-selected-bg-color, orange);
-          color: var(--si-cell-selected-text-color, white);
-          font-weight: var(--si-cell-selected-font-weight, bold);
-        }
-
-        form > table > tbody > tr > td > label.weekend > span {
-          color: var(--si-cell-weekend-text-color);
-        }
-
-        form > table > tbody > tr > td > label.other-month > span {
-          display: flex;
-          color: var(--si-cell-other-month-text-color);
-        }
-
-        form > table > tbody > tr > td > label.other-month.weekend > span {
-          color: var(--si-cell-other-month-weekend-text-color, tomato);
-        }
-      `,
-    ]));
+    this.getContext(DatePickerControlElement)
+      ?.dispatchEvent(new SelectedDateSetEvent(this.#selectedDate));
   }
 
   #render() {
@@ -522,7 +584,9 @@ export class DatePickerViewElement extends ContextAwareElement {
           el('tr', [
             ...this.dayShortNames.map((dayShortName) => {
               return el('th', [
-                tx(dayShortName),
+                el('span', [
+                  tx(dayShortName),
+                ]),
               ]);
             }),
           ]),
@@ -560,7 +624,9 @@ export class DatePickerViewElement extends ContextAwareElement {
                   }),
                 ]),
                 el('span', [
-                  tx(date.date.getDate().toString().padStart(2, '0')),
+                  el('span', [
+                    tx(date.date.getDate().toString().padStart(2, '0')),
+                  ]),
                 ]),
               ]),
             ]);

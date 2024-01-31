@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Range Datetime Picker</title>
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/400.css " rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/500.css " rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/600.css " rel="stylesheet">
     <script type="module" src="./index.js"></script>
 </head>
 
@@ -21,28 +24,114 @@
             <section>
                 <h2>OeyPay Style</h2>
                 <date-picker
+                    id="datePicker"
+                    lang="id"
+                    value="2024-01-31T07:00:00.000Z"
                     style="
-                        --si-width: 315px;
-                        --si-cell-selected-bg-color: #FFBE00;
-                        --si-cell-selected-text-color: #FFFFFF;
-                        --si-cell-weekend-text-color: #999999;
-                        --si-cell-other-month-weekend-text-color: #999999;
+                        --oeypay-yellow: #FFBE00;
+                        --oeypay-silver: #90A3BF;
+                        --si-dialog-radius: 8px;
+                        --si-dialog-padding: 16px;
                     "
                 >
+                    <date-picker-view
+                        slot="date-picker-view"
+                        style="
+                            --si-width: 315px;
+                            --si-header-height: 36px;
+                            --si-cell-height: 36px;
+                            --si-cell-selected-bg-color: var(--oeypay-yellow);
+                            --si-cell-selected-text-color: #FFFFFF;
+                            --si-cell-selected-font-weight: 600;
+                            --si-cell-weekend-text-color: #999999;
+                            --si-cell-other-month-weekend-text-color: #999999;
+                            --si-inner-cell-size: 28px;
+                            font-family: 'Inter', sans-serif;
+                        "
+                    >
+                        <div
+                            slot="year-month-controls"
+                            style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding: 8px;
+                                gap: 10px;
+                                font-weight: 600;
+                            "
+                        >
+                            <date-picker-month-view></date-picker-month-view>
+                            <date-picker-year-view></date-picker-year-view>
+                        </div>
+                    </date-picker-view>
                     <div
-                        slot="year-month-controls"
+                        slot="form-controls"
                         style="
                             display: flex;
+                            flex-direction: column;
                             justify-content: space-between;
                             align-items: center;
+                            padding: 8px;
                             gap: 10px;
                             font-weight: 600;
                         "
                     >
-                        <date-picker-month-view></date-picker-month-view>
-                        <date-picker-year-view></date-picker-year-view>
+                        <button
+                            type="submit"
+                            onclick="datePicker.requestSubmit();"
+                            style="
+                                display: block;
+                                box-sizing: border-box;
+                                height: 40px;
+                                width: 100%;
+                                border: none;
+                                border-radius: 8px;
+                                background-color: var(--oeypay-yellow);
+                                color: #FFFFFF;
+                                font-size: 16px;
+                                font-weight: 500;
+                                box-shadow: inset 0px -2px 0px 0px rgba(89, 103, 128, 0.2);
+                            "
+                        >Apply</button>
+                        <button
+                            type="button"
+                            onclick="datePicker.closeDatePicker();"
+                            style="
+                                display: block;
+                                box-sizing: border-box;
+                                height: 40px;
+                                width: 100%;
+                                border: 1px solid var(--oeypay-silver);
+                                border-radius: 8px;
+                                background-color: white;
+                                color: var(--oeypay-silver);
+                                font-size: 16px;
+                                font-weight: 500;
+                            "
+                        >Cancel</button>
                     </div>
                 </date-picker>
+            </section>
+            <section>
+                <h2>Input Type</h2>
+                <div>
+                    <label>
+                        <span>datetime-local</span>
+                        <input type="datetime-local">
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <span>date</span>
+                        <input type="time">
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <span>time</span>
+                        <input type="date">
+                    </label>
+                </div>
             </section>
         </main>
     </div>

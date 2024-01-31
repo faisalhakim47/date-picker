@@ -18,15 +18,17 @@ export class DatePickerMonthViewElement extends ContextAwareElement {
   }
 
   connectedCallback() {
+    super.connectedCallback();
+
     this.#render();
 
     this.getContext(DatePickerViewElement)
-      .addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
+      ?.addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
   }
 
   disconnectedCallback() {
     this.getContext(DatePickerViewElement)
-      .removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
+      ?.removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
   }
 
   /**

@@ -1,13 +1,9 @@
+// @ts-check
+
 import { DateRelatedEvent } from './date-related-event.js';
 
-/**
- * @typedef {object} SelectedDateSetEventDetail
- * @property {Date} date
- */
+/** @typedef {import('./date-related-event.js').DateRelatedEventDetail} DateRelatedEventDetail */
 
-/**
- * @extends {CustomEvent<SelectedDateSetEventDetail>}
- */
 export class SelectedDateSetEvent extends DateRelatedEvent {
   static get EVENT_TYPE() {
     return 'selected-date-set';
@@ -15,7 +11,7 @@ export class SelectedDateSetEvent extends DateRelatedEvent {
 
   /**
    * @param {Date} date
-   * @param {CustomEventInit<SelectedDateSetEventDetail>} [options]
+   * @param {CustomEventInit<DateRelatedEventDetail>} [options]
    */
   constructor(date, options) {
     super(SelectedDateSetEvent.EVENT_TYPE, date, options);

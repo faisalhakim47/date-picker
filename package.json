@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
+    "build": "tsc --project tsconfig.json && esbuild --bundle --minify --sourcemap --format=esm --outfile=dist/index.bundle.min.js dist/index.js",
     "dev": "web-dev-server",
     "test": "test"
   },
@@ -12,6 +13,8 @@
   "license": "ISC",
   "types": "src/elements.d.ts",
   "devDependencies": {
-    "@web/dev-server": "^0.4.1"
+    "@web/dev-server": "^0.4.1",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.3.3"
   }
 }

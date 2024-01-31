@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * @typedef {object} YearMonthViewChangeEventDetail
  * @property {number} year
@@ -6,7 +8,7 @@
  */
 
 /**
- * @extends {CustomEvent<MonthViewChangeEventDetail>}
+ * @extends {CustomEvent<YearMonthViewChangeEventDetail>}
  */
 export class YearMonthViewChangeEvent extends CustomEvent {
   static get EVENT_TYPE() {
@@ -18,9 +20,6 @@ export class YearMonthViewChangeEvent extends CustomEvent {
 
   /** @type {number} */
   #monthIndex;
-
-  /** @type {string} */
-  #monthLabel;
 
   /**
    * @param {number} year
@@ -39,6 +38,7 @@ export class YearMonthViewChangeEvent extends CustomEvent {
       },
     });
 
+    this.#year = year;
     this.#monthIndex = monthIndex;
   }
 
@@ -48,9 +48,5 @@ export class YearMonthViewChangeEvent extends CustomEvent {
 
   get monthIndex() {
     return this.#monthIndex;
-  }
-
-  get monthLabel() {
-    return this.#monthLabel;
   }
 }
