@@ -2,7 +2,7 @@
   "name": "range-datetime-picker",
   "version": "1.0.0",
   "description": "Range Date time picker",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "dev": "web-dev-server",

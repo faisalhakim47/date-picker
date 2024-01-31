@@ -1,15 +1,14 @@
 import { tx } from './helper.js';
-import { YearViewChangeEvent } from './events/year-view-change-event.js';
+import { ContextAwareElement } from './context-aware-element.js';
+import { YearMonthViewChangeEvent } from './events/year-month-view-change-event.js';
+import { DatePickerViewElement } from './date-picker-view-element.js';
 
-export class DatePickerYearViewElement extends HTMLElement {
+export class DatePickerYearViewElement extends ContextAwareElement {
   /** @type {ShadowRoot} */
   #shadowRoot;
 
   /** @type {Text} */
   #text;
-
-  /** @type {string} */
-  #defaultText = '';
 
   constructor() {
     super();
@@ -17,25 +16,26 @@ export class DatePickerYearViewElement extends HTMLElement {
   }
 
   connectedCallback() {
-    this.#defaultText = this.attributes.getNamedItem('default-text')?.value ?? '';
     this.#render();
-    this.addEventListener(YearViewChangeEvent.EVENT_TYPE, this.#handleChange);
+    this.getContext(DatePickerViewElement)
+      .addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
   }
 
   disconnectedCallback() {
-    this.removeEventListener(YearViewChangeEvent.EVENT_TYPE, this.#handleChange);
+    this.getContext(DatePickerViewElement)
+      .removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
   }
 
   /**
    * @param {CustomEvent} event
    */
   #handleChange = (event) => {
-    if (event instanceof YearViewChangeEvent) {
+    if (event instanceof YearMonthViewChangeEvent) {
       this.#text.nodeValue = event.detail.year.toString();
     }
   }
 
   #render() {
-    this.#shadowRoot.appendChild(this.#text = tx(this.#defaultText));
+    this.#shadowRoot.appendChild(this.#text = tx(''));
   }
 }

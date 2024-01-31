@@ -1,17 +1,16 @@
 // @ts-check
 
 import { tx } from './helper.js';
-import { MonthViewChangeEvent } from './events/month-view-change-event.js';
+import { ContextAwareElement } from './context-aware-element.js';
+import { YearMonthViewChangeEvent } from './events/year-month-view-change-event.js';
+import { DatePickerViewElement } from './date-picker-view-element.js';
 
-export class DatePickerMonthViewElement extends HTMLElement {
+export class DatePickerMonthViewElement extends ContextAwareElement {
   /** @type {ShadowRoot} */
   #shadowRoot;
 
   /** @type {Text} */
   #text;
-
-  /** @type {string} */
-  #defaultText = '';
 
   constructor() {
     super();
@@ -19,25 +18,27 @@ export class DatePickerMonthViewElement extends HTMLElement {
   }
 
   connectedCallback() {
-    this.#defaultText = this.attributes.getNamedItem('default-text')?.value ?? '';
     this.#render();
-    this.addEventListener(MonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
+
+    this.getContext(DatePickerViewElement)
+      .addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
   }
 
   disconnectedCallback() {
-    this.removeEventListener(MonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
+    this.getContext(DatePickerViewElement)
+      .removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
   }
 
   /**
    * @param {Event} event
    */
   #handleChange = (event) => {
-    if (event instanceof MonthViewChangeEvent) {
-      this.#text.nodeValue = event.detail.month.toString();
+    if (event instanceof YearMonthViewChangeEvent) {
+      this.#text.nodeValue = event.detail.monthLabel.toString();
     }
   }
 
   #render() {
-    this.#shadowRoot.appendChild(this.#text = tx(this.#defaultText));
+    this.#shadowRoot.appendChild(this.#text = tx(''));
   }
 }
