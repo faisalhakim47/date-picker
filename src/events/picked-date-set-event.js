@@ -4,16 +4,17 @@ import { DateRelatedEvent } from './date-related-event.js';
 
 /** @typedef {import('./date-related-event.js').DateRelatedEventDetail} DateRelatedEventDetail */
 
-export class DatePickEvent extends DateRelatedEvent {
+export class PickedDateSetEvent extends DateRelatedEvent {
   static get EVENT_TYPE() {
-    return 'date-pick';
+    return 'picked-date-set';
   }
 
   /**
-   * @param {Date} date
+   * @param {Date} beginDate
+   * @param {Date} endDate
    * @param {CustomEventInit<DateRelatedEventDetail>} [options]
    */
-  constructor(date, options) {
-    super(DatePickEvent.EVENT_TYPE, date, options);
+  constructor(beginDate, endDate, options) {
+    super(PickedDateSetEvent.EVENT_TYPE, beginDate, endDate, options);
   }
 }

@@ -14,22 +14,25 @@
  * @typedef {BasicProp|FnProp<TagName>|void} Prop
  */
 
+// let padding = 0;
+
 /**
  * @template {keyof HTMLElementTagNameMap} TagName
  * @template {HTMLElementTagNameMap[TagName]} Elm
  * @param {TagName|Elm} tagNameOrElement
- * @param {Array<Prop<TagName>>|((element: HTMLElementTagNameMap[TagName]|Elm) => Array<Prop<TagName>>)} propsOrPropFn
+ * @param {(element: HTMLElementTagNameMap[TagName]|Elm) => Array<Prop<TagName>>} propFn
  * @returns {HTMLElementTagNameMap[TagName]|Elm}
  */
-export function el(tagNameOrElement, propsOrPropFn) {
-    /** @type {HTMLElementTagNameMap[TagName]|Elm} */
+export function el(tagNameOrElement, propFn) {
+  // console.log(`${' '.repeat(padding)}<${tagNameOrElement}>`);
+  // padding += 2;
+
+  /** @type {HTMLElementTagNameMap[TagName]|Elm} */
   const element = (typeof tagNameOrElement === 'string')
     ? document.createElement(tagNameOrElement)
     : tagNameOrElement;
 
-  const props = typeof propsOrPropFn === 'function'
-    ? propsOrPropFn(element)
-    : propsOrPropFn;
+  const props = propFn(element);
 
   for (const prop of props) {
     if (prop instanceof Attr) {
@@ -46,6 +49,9 @@ export function el(tagNameOrElement, propsOrPropFn) {
       element.appendChild(text);
     }
   }
+
+  // padding -= 2;
+  // console.log(`${' '.repeat(padding)}</${tagNameOrElement}>`);
 
   return element;
 }

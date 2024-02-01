@@ -1,34 +1,40 @@
 // @ts-check
 
 export class ContextAwareElement extends HTMLElement {
-  connectedCallback() {
-    this.#checkRequiredContexts();
-  }
-
-  #checkRequiredContexts() {
-    const requiredContexts = this.constructor['requiredContexts'];
-    if (Array.isArray(requiredContexts)) {
-      for (const requiredContext of requiredContexts) {
-        if (!this.getContext(requiredContext)) {
-          console.warn(`Element ${this.localName} requires context ${requiredContext.name}`);
-        }
-      }
-    }
-  }
-
   /**
+   * Why is this method async?
+   * this method usually is called in connectedCallback hook of web component
+   * but unfortunately, before connectedCallback is called, the element is not yet attached to the DOM
+   * therefore the parentElement is invalid, and we need to wait for the next tick
+   *
    * @template {ContextAwareElement} T
    * @param {new () => T} constructor
-   * @returns {T}
+   * @returns {Promise<T>}
    */
-  getContext(constructor) {
-    /** @type {Node} */
-    let element = this;
-    while (element) {
-      if (element instanceof constructor) {
-        return element;
-      }
-      element = element.parentNode;
-    }
+  async requireContext(constructor) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        /** @type {Node} */
+        let element = this;
+
+        while (element instanceof Node) {
+          if (element instanceof constructor) {
+            resolve(element);
+            return;
+          }
+
+          if (element instanceof ShadowRoot) {
+            element = element.host;
+          }
+          else {
+            element = element.parentNode;
+          }
+        }
+
+        console.warn(`Context ${constructor.name} not found`);
+
+        reject(new Error(`Context ${constructor.name} not found`));
+      });
+    });
   }
 }

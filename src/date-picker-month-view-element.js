@@ -6,35 +6,31 @@ import { YearMonthViewChangeEvent } from './events/year-month-view-change-event.
 import { DatePickerViewElement } from './date-picker-view-element.js';
 
 export class DatePickerMonthViewElement extends ContextAwareElement {
-  /** @type {ShadowRoot} */
-  #shadowRoot;
+  #shadowRoot = this.attachShadow({ mode: 'closed' });
 
   /** @type {Text} */
   #text;
 
-  constructor() {
-    super();
-    this.#shadowRoot = this.attachShadow({ mode: 'closed' });
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-
+  async connectedCallback() {
     this.#render();
 
-    this.getContext(DatePickerViewElement)
-      ?.addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
+    const viewCtx = await this.requireContext(DatePickerViewElement);
+
+    viewCtx.addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleMonthViewChange);
+
+    this.#text.nodeValue = viewCtx.monthNames[viewCtx.monthIndexView];
   }
 
-  disconnectedCallback() {
-    this.getContext(DatePickerViewElement)
-      ?.removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
+  async disconnectedCallback() {
+    const viewCtx = await this.requireContext(DatePickerViewElement);
+
+    viewCtx.removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleMonthViewChange);
   }
 
   /**
    * @param {Event} event
    */
-  #handleChange = (event) => {
+  #handleMonthViewChange = (event) => {
     if (event instanceof YearMonthViewChangeEvent) {
       this.#text.nodeValue = event.detail.monthLabel.toString();
     }

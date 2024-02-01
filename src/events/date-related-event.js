@@ -2,7 +2,8 @@
 
 /**
  * @typedef {object} DateRelatedEventDetail
- * @property {Date} date
+ * @property {Date} beginDate
+ * @property {Date} endDate
  */
 
 /**
@@ -10,26 +11,36 @@
  */
 export class DateRelatedEvent extends CustomEvent {
   /** @type {Date} */
-  #date;
+  #beginDate;
+
+  /** @type {Date} */
+  #endDate;
 
   /**
    * @param {string} type
-   * @param {Date} date
+   * @param {Date} beginDate
+   * @param {Date} endDate
    * @param {CustomEventInit<DateRelatedEventDetail>} [options]
    */
-  constructor(type, date, options) {
+  constructor(type, beginDate, endDate, options) {
     super(type, {
       ...options,
       detail: {
         ...options?.detail,
-        date,
+        beginDate,
+        endDate,
       },
     });
 
-    this.#date = date;
+    this.#beginDate = beginDate;
+    this.#endDate = endDate;
   }
 
-  get date() {
-    return this.#date;
+  get beginDate() {
+    return this.#beginDate;
+  }
+
+  get endDate() {
+    return this.#endDate;
   }
 }

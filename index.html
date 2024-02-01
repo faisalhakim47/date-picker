@@ -16,20 +16,34 @@
         <header>
             <h1>Range Datetime Picker</h1>
         </header>
-        <main>
+        <form id="datePickerForm">
             <section>
-                <h2>Default Style</h2>
-                <date-picker-view></date-picker-view>
+                <h2>Inline Date Picker, Single Selection</h2>
+                <date-picker-inline
+                    name="single-date"
+                    selection-mode="single"
+                    value="2024-01-05"
+                ></date-picker-inline>
             </section>
+
+            <section>
+                <h2>Inline Date Picker, Range Selection</h2>
+                <date-picker-inline
+                    name="range-dates"
+                    selection-mode="range"
+                ></date-picker-inline>
+            </section>
+
             <section>
                 <h2>OeyPay Style</h2>
                 <date-picker
                     id="datePicker"
-                    lang="id"
                     value="2024-01-31T07:00:00.000Z"
                     style="
                         --oeypay-yellow: #FFBE00;
+                        --oeypay-lightyellow: rgba(255, 229, 154, 0.2);
                         --oeypay-silver: #90A3BF;
+                        --oeypay-silver-text: rgba(24, 30, 48, 0.32);
                         --si-dialog-radius: 8px;
                         --si-dialog-padding: 16px;
                     "
@@ -40,11 +54,12 @@
                             --si-width: 315px;
                             --si-header-height: 36px;
                             --si-cell-height: 36px;
-                            --si-cell-selected-bg-color: var(--oeypay-yellow);
+                            --si-cell-selected-bg-color: var(--oeypay-lightyellow);
                             --si-cell-selected-text-color: #FFFFFF;
                             --si-cell-selected-font-weight: 600;
-                            --si-cell-weekend-text-color: #999999;
-                            --si-cell-other-month-weekend-text-color: #999999;
+                            --si-cell-weekend-text-color: var(--oeypay-silver-text);
+                            --si-cell-other-month-weekend-text-color: var(--oeypay-silver-text);
+                            --si-inner-cell-selected-bg-color: var(--oeypay-yellow);
                             --si-inner-cell-size: 28px;
                             font-family: 'Inter', sans-serif;
                         "
@@ -133,7 +148,7 @@
                     </label>
                 </div>
             </section>
-        </main>
+        </form>
     </div>
 </body>
 

@@ -1,7 +1,6 @@
 // @ts-check
 
 import './src/index.js';
-import { DatePickerElement, DatePickerSubmitEvent } from './src/index.js';
 
 // import { DatePickerInlineElement } from './src/index.js';
 

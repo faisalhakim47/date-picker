@@ -10,10 +10,11 @@ export class SelectedDateSetEvent extends DateRelatedEvent {
   }
 
   /**
-   * @param {Date} date
+   * @param {Date} beginDate
+   * @param {Date} endDate
    * @param {CustomEventInit<DateRelatedEventDetail>} [options]
    */
-  constructor(date, options) {
-    super(SelectedDateSetEvent.EVENT_TYPE, date, options);
+  constructor(beginDate, endDate, options) {
+    super(SelectedDateSetEvent.EVENT_TYPE, beginDate, endDate, options);
   }
 }

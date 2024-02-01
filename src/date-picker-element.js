@@ -54,8 +54,7 @@ dialog > form > slot > div > button {
     ];
   }
 
-  /** @type {ShadowRoot} */
-  #shadowRoot;
+  #shadowRoot = this.attachShadow({ mode: 'closed' });
 
   /** @type {Text} */
   #buttonText;
@@ -78,15 +77,7 @@ dialog > form > slot > div > button {
   /** @type {Date} */
   #selectedDate;
 
-  constructor() {
-    super();
-
-    this.#shadowRoot = this.attachShadow({ mode: 'closed' });
-  }
-
   connectedCallback() {
-    super.connectedCallback();
-
     this.#shadowRoot.adoptedStyleSheets = DatePickerElement.#STYLES;
 
     this.#render();
@@ -166,7 +157,7 @@ dialog > form > slot > div > button {
   }
 
   #updateButtonText() {
-    if (this.dateValue instanceof Date) {
+    if (this.beginDateValue instanceof Date) {
       if (this.#buttonText instanceof Text) {
         this.#buttonText.nodeValue = `Selected Date: ${this.value}`;
       }
@@ -213,7 +204,7 @@ dialog > form > slot > div > button {
    */
   #handleSelectedDateSet = (event) => {
     if (event instanceof SelectedDateSetEvent) {
-      this.#selectedDate = event.date;
+      this.#selectedDate = event.beginDate;
     }
   };
 
@@ -258,7 +249,8 @@ dialog > form > slot > div > button {
         );
         let datePickerViewElement = treeWalker.currentNode;
         while (datePickerViewElement instanceof DatePickerViewElement) {
-          datePickerViewElement.setSelectedDate(this.dateValue);
+          datePickerViewElement.setSelectedBeginDate(this.beginDateValue);
+          datePickerViewElement.setSelectedEndDate(this.endDateValue);
           datePickerViewElement = treeWalker.nextNode();
         }
       }
@@ -266,31 +258,31 @@ dialog > form > slot > div > button {
   };
 
   #render() {
-    this.#shadowRoot.appendChild(el('div', [
-      this.#datePickerControlsSlot = el('slot', [
+    this.#shadowRoot.appendChild(el('div', () => [
+      this.#datePickerControlsSlot = el('slot', () => [
         at('name', 'date-picker-controls'),
-        el('button', [
+        el('button', () => [
           on('click', this.#openDatePicker),
           this.#buttonText = tx('Select Date'),
         ]),
       ]),
-      this.#dialog = el('dialog', [
-        this.#form = el('form', [
+      this.#dialog = el('dialog', () => [
+        this.#form = el('form', () => [
           at('method', 'dialog'),
           on('submit', this.#handleFormSubmit),
-          this.#datePickerViewSlot = el('slot', [
+          this.#datePickerViewSlot = el('slot', () => [
             at('name', 'date-picker-view'),
-            el('date-picker-view', []),
+            el('date-picker-view', () => []),
           ]),
-          this.#formControlsSlot = el('slot', [
+          this.#formControlsSlot = el('slot', () => [
             at('name', 'form-controls'),
-            el('div', [
-              el('button', [
+            el('div', () => [
+              el('button', () => [
                 at('type', 'button'),
                 on('click', this.#closeDatePicker),
                 tx('Cancel'),
               ]),
-              el('button', [
+              el('button', () => [
                 at('type', 'submit'),
                 tx('Apply'),
               ]),

@@ -12,29 +12,25 @@ export class DatePickerYearViewElement extends ContextAwareElement {
     ];
   }
 
-  /** @type {ShadowRoot} */
-  #shadowRoot;
+  #shadowRoot = this.attachShadow({ mode: 'closed' });
 
   /** @type {Text} */
   #text;
 
-  constructor() {
-    super();
-    this.#shadowRoot = this.attachShadow({ mode: 'closed' });
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-
+  async connectedCallback() {
     this.#render();
 
-    this.getContext(DatePickerViewElement)
-      ?.addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
+    const viewCtx = await this.requireContext(DatePickerViewElement);
+
+    viewCtx.addEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
   }
 
-  disconnectedCallback() {
-    this.getContext(DatePickerViewElement)
-      ?.removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
+  async disconnectedCallback() {
+    const viewCtx = await this.requireContext(DatePickerViewElement);
+
+    viewCtx.removeEventListener(YearMonthViewChangeEvent.EVENT_TYPE, this.#handleChange);
+
+    this.#text.nodeValue = viewCtx.yearView?.toString();
   }
 
   /**
