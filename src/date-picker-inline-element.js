@@ -2,11 +2,8 @@
 
 import './date-picker-view.js';
 import { DatePickerControlElement } from './date-picker-control-element.js';
-import { PickedDateChangeEvent } from './events/picked-date-change-event.js';
 import { PickedDateSetEvent } from './events/picked-date-set-event.js';
-import { SelectedDateChangeEvent } from './events/selected-date-change-event.js';
 import { SelectionModeSetEvent } from './events/selection-mode-set-event.js';
-import { dateRangeToString } from './tools/date.js';
 import { at, el } from './tools/dom.js';
 
 export class DatePickerInlineElement extends DatePickerControlElement {
@@ -33,22 +30,12 @@ export class DatePickerInlineElement extends DatePickerControlElement {
 
   #shadowRoot = this.attachShadow({ mode: 'closed' });
 
-  async connectedCallback() {
+  connectedCallback() {
     super.connectedCallback();
 
     this.#shadowRoot.adoptedStyleSheets = DatePickerInlineElement.#STYLES;
 
     this.#render();
-
-    const controlCtx = await this.requireContext(DatePickerControlElement);
-
-    controlCtx.addEventListener(SelectedDateChangeEvent.EVENT_TYPE, this.#handleSelectedDateChange);
-  }
-
-  async disconnectedCallback() {
-    const controlCtx = await this.requireContext(DatePickerControlElement);
-
-    controlCtx.removeEventListener(SelectedDateChangeEvent.EVENT_TYPE, this.#handleSelectedDateChange);
   }
 
   /**
@@ -78,23 +65,6 @@ export class DatePickerInlineElement extends DatePickerControlElement {
       controlCtx.dispatchEvent(new SelectionModeSetEvent(this.selectionMode));
     }
   }
-
-  /**
-   * @param {Event} event
-   */
-  #handleSelectedDateChange = (event) => {
-    if (event instanceof SelectedDateChangeEvent) {
-      this.value = dateRangeToString({
-        beginDate: event.beginDate,
-        endDate: event.endDate,
-      });
-
-      this.dispatchEvent(new PickedDateChangeEvent({
-        beginDate: event.beginDate,
-        endDate: event.endDate,
-      }));
-    }
-  };
 
   #render() {
     this.#shadowRoot.appendChild(

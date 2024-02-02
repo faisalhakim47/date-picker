@@ -85,8 +85,13 @@ export function dateToNumber(date) {
  * @returns {Date}
  */
 export function dateStringToDate(dateString) {
-  const [yearStr, monthStr, dateStr] = dateString.split('-');
+  
 
+  const [yearStr, monthStr, rawDateStr] = dateString.split('-');
+
+  const dateStr = (rawDateStr || '')
+    .split('T')[0]
+    .split(' ')[0];
 
   const year = parseInt(yearStr, 10);
   const month = parseInt(monthStr, 10);

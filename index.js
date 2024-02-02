@@ -1,7 +1,7 @@
 // @ts-check
 
 import './src/index.js';
-import { DatePickerInlineElement, PickedDateChangeEvent } from './src/index.js';
+import { DatePickerElement, DatePickerInlineElement, PickedDateChangeEvent } from './src/index.js';
 
 window.addEventListener('load', function () {
   const form = document.getElementById('datePickerForm');
@@ -22,6 +22,20 @@ window.addEventListener('load', function () {
 
   inlineSingleDate.addEventListener('input', function (event) {
     console.log(event.constructor.name, event);
+  });
+
+  const oeypayDate = form.elements.namedItem('oeypay-date');
+
+  if (!(oeypayDate instanceof DatePickerElement)) {
+    throw new Error('The element is not an instance of DatePickerElement.');
+  }
+
+  oeypayDate.addEventListener(PickedDateChangeEvent.EVENT_TYPE, function (event) {
+    console.log(PickedDateChangeEvent.name, event);
+  });
+
+  oeypayDate.addEventListener('input', function (event) {
+    console.log(event.constructor.name, event.composedPath());
   });
 });
 

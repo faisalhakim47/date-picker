@@ -547,14 +547,60 @@ section > table > tbody > tr > td > label.other-month.weekend > span > span {
    * @param {Date} date
    */
   async #handleDateSelect(date) {
-    if (this.#selectedEndDate instanceof Date || this.#selectionMode === DatePickerControlElement.SELECTION_MODE_SINGLE) {
-      this.setSelectedBeginDate(date);
+    if (this.#selectionMode === DatePickerControlElement.SELECTION_MODE_SINGLE) {
+      if (this.#selectedBeginDate instanceof Date) {
+        if (this.#selectedBeginDate.getTime() === date.getTime()) {
+          this.setSelectedBeginDate(null);
+        }
+        else {
+          this.setSelectedBeginDate(date);
+        }
+      }
+      else {
+        this.setSelectedBeginDate(date);
+      }
     }
-    else if (this.#selectedBeginDate instanceof Date) {
-      this.setSelectedEndDate(date);
+    else if (this.#selectionMode === DatePickerControlElement.SELECTION_MODE_RANGE) {
+      if (this.#selectedBeginDate instanceof Date) {
+        if (date.getTime() < this.#selectedBeginDate.getTime()) {
+          this.setSelectedBeginDate(date);
+        }
+        else {
+          if (this.#selectedBeginDate.getTime() === date.getTime()) {
+            this.setSelectedBeginDate(null);
+          }
+          else {
+            /**
+             * What happens when begin date and end date has been set?
+             */
+            if (this.#selectedEndDate instanceof Date) {
+              /**
+               * USE CASE 1: Reset
+               */
+              this.setSelectedBeginDate(date);
+
+              /**
+               * USE CASE 2: Set end date
+               */
+              // if (date.getTime() === this.#selectedEndDate.getTime()) {
+              //   this.setSelectedEndDate(null);
+              // }
+              // else {
+              //   this.setSelectedEndDate(date);
+              // }
+            }
+            else {
+              this.setSelectedEndDate(date);
+            }
+          }
+        }
+      }
+      else {
+        this.setSelectedBeginDate(date);
+      }
     }
     else {
-      this.setSelectedBeginDate(date);
+      throw new Error('Invalid selection mode: ' + this.#selectionMode);
     }
 
     const controlCtx = await this.requireContext(DatePickerControlElement);
