@@ -1,6 +1,8 @@
 // @ts-check
 
-/** @typedef {import('../date-picker-control-element.js').SelectionMode} SelectionMode */
+/** @typedef {import('../tools/date.js').DateRange} DateRange */
+/** @typedef {import('./date-related-event.js').DateRelatedEventDetail} DateRelatedEventDetail */
+/** @typedef {'single'|'range'} SelectionMode */
 
 /**
  * @typedef {object} SelectionModeSetEventDetail

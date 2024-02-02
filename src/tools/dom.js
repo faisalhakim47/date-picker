@@ -26,14 +26,14 @@
 export function el(tagNameOrElement, propFn) {
   // console.log(`${' '.repeat(padding)}<${tagNameOrElement}>`);
   // padding += 2;
-  
+
   /** @type {HTMLElementTagNameMap[TagName]|Elm} */
   const element = (typeof tagNameOrElement === 'string')
     ? document.createElement(tagNameOrElement)
     : tagNameOrElement;
-  
+
   const props = propFn(element);
-  
+
   for (const prop of props) {
     if (prop instanceof Attr) {
       element.setAttributeNode(prop);
@@ -49,13 +49,13 @@ export function el(tagNameOrElement, propFn) {
       element.appendChild(text);
     }
   }
-  
+
   // padding -= 2;
   // console.log(`${' '.repeat(padding)}</${tagNameOrElement}>`);
-  
+
   return element;
 }
-  
+
 /**
    * @param {string} localName
    * @param {string} value
@@ -66,7 +66,7 @@ export function at(localName, value) {
   attr.value = value;
   return attr;
 }
-  
+
 /**
    * @param {string} data
    * @returns {Text}
@@ -75,7 +75,7 @@ export function tx(data) {
   const text = document.createTextNode(data);
   return text;
 }
-  
+
 /**
    * @template {keyof HTMLElementTagNameMap} TagName
    * @template {keyof HTMLElementEventMap} EventName
@@ -91,4 +91,3 @@ export function on(type, listener, options) {
     element.addEventListener(type, bypassTypingListener, options);
   };
 }
-  

@@ -2,6 +2,7 @@
 
 import { DateRelatedEvent } from './date-related-event.js';
 
+/** @typedef {import('../tools/date.js').DateRange} DateRange */
 /** @typedef {import('./date-related-event.js').DateRelatedEventDetail} DateRelatedEventDetail */
 
 export class SelectedDateSetEvent extends DateRelatedEvent {
@@ -10,11 +11,10 @@ export class SelectedDateSetEvent extends DateRelatedEvent {
   }
 
   /**
-   * @param {Date} beginDate
-   * @param {Date} endDate
+   * @param {DateRange} dateRange
    * @param {CustomEventInit<DateRelatedEventDetail>} [options]
    */
-  constructor(beginDate, endDate, options) {
-    super(SelectedDateSetEvent.EVENT_TYPE, beginDate, endDate, options);
+  constructor(dateRange, options) {
+    super(SelectedDateSetEvent.EVENT_TYPE, dateRange, options);
   }
 }

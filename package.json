@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc --project tsconfig.json && esbuild --bundle --minify --sourcemap --format=esm --outfile=dist/index.bundle.min.js dist/index.js",
     "dev": "web-dev-server",
-    "test": "test"
+    "test": "test",
+    "format": "eslint --fix src"
   },
   "author": "",
   "license": "ISC",

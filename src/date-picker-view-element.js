@@ -559,10 +559,10 @@ section > table > tbody > tr > td > label.other-month.weekend > span > span {
 
     const controlCtx = await this.requireContext(DatePickerControlElement);
 
-    controlCtx.dispatchEvent(new SelectedDateChangeEvent(
-      this.#selectedBeginDate,
-      this.#selectedEndDate,
-    ));
+    controlCtx.dispatchEvent(new SelectedDateChangeEvent({
+      beginDate: this.#selectedBeginDate,
+      endDate: this.#selectedEndDate,
+    }));
   }
 
   /**

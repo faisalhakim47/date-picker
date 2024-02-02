@@ -2,16 +2,12 @@
 
 import { ContextAwareElement } from './context-aware-element.js';
 import { PickedDateSetEvent } from './events/picked-date-set-event.js';
-import { dateToString, isInvalidDate } from './tools/date.js';
+import { dateStringToDate, dateToString, isInvalidDate } from './tools/date.js';
 
-// @ts-check
+/** @typedef {import('./events/selection-mode-set-event.js').SelectionMode} SelectionMode */
 
 /**
  * @typedef {'day'} TimeUnit
- */
-
-/**
- * @typedef {'single'|'range'} SelectionMode
  */
 
 export class DatePickerControlElement extends ContextAwareElement {
@@ -92,13 +88,73 @@ export class DatePickerControlElement extends ContextAwareElement {
   }
 
   get value() {
-    return this.#beginDate.toISOString();
+    /** @type {(date: Date) => string} */
+    let dateFormatter = null;
+
+    if (this.#timeUnit === DatePickerControlElement.TIME_UNIT_DAY) {
+      dateFormatter = dateToString;
+    }
+    else {
+      throw new Error('Invalid time unit');
+    }
+
+    if (this.#selectionMode === DatePickerControlElement.SELECTION_MODE_RANGE) {
+      return (this.#beginDate instanceof Date && this.#endDate instanceof Date)
+        ? `${dateFormatter(this.#beginDate)}/${dateFormatter(this.#endDate)}`
+        : null;
+    }
+    else if (this.#selectionMode === DatePickerControlElement.SELECTION_MODE_SINGLE) {
+      return this.#beginDate instanceof Date
+        ? dateFormatter(this.#beginDate)
+        : null;
+    }
+    else {
+      throw new Error('Invalid selection mode');
+    }
   }
 
   /**
-   * @param {string} value date iso string
+   * @param {string} value
    */
   set value(value) {
+    /** @type {(dateStr: string) => Date} */
+    let dateParser = null;
+
+    if (this.#timeUnit === DatePickerControlElement.TIME_UNIT_DAY) {
+      dateParser = dateStringToDate;
+    }
+    else {
+      throw new Error('Invalid time unit');
+    }
+
+    if (this.#selectionMode === DatePickerControlElement.SELECTION_MODE_RANGE) {
+      const [beginDateStr, endDateStr] = (value ?? '').split('/');
+    }
+    else if (this.#selectionMode === DatePickerControlElement.SELECTION_MODE_SINGLE) {
+      const date = dateParser(value);
+
+      if (isInvalidDate(date)) {
+        this.#beginDate = null;
+        this.#internals.setFormValue(null);
+        this.removeAttribute('value');
+        this.dispatchEvent(new PickedDateSetEvent({
+          beginDate: null,
+          endDate: null,
+        }));
+      }
+      else {
+        this.#beginDate = date;
+        this.#internals.setFormValue(dateToString(date));
+        this.dispatchEvent(new PickedDateSetEvent({
+          beginDate: date,
+          endDate: null,
+        }));
+      }
+    }
+    else {
+      throw new Error('Invalid selection mode');
+    }
+
     const [beginDateStr, endDateStr] = (value ?? '').split('/');
 
     const beginDate = beginDateStr
@@ -116,7 +172,11 @@ export class DatePickerControlElement extends ContextAwareElement {
       this.#beginDate = null;
       this.#endDate = null;
       this.#internals.setFormValue(null);
-      this.dispatchEvent(new PickedDateSetEvent(null, null));
+      this.removeAttribute('value');
+      this.dispatchEvent(new PickedDateSetEvent({
+        beginDate: null,
+        endDate: null,
+      }));
     }
     else {
       const beginDateStr = dateToString(beginDate);
@@ -125,13 +185,19 @@ export class DatePickerControlElement extends ContextAwareElement {
       if (isInvalidEndDate) {
         this.#endDate = null;
         this.#internals.setFormValue(beginDateStr);
-        this.dispatchEvent(new PickedDateSetEvent(beginDate, null));
+        this.dispatchEvent(new PickedDateSetEvent({
+          beginDate,
+          endDate: null,
+        }));
       }
       else {
         const endDateStr = dateToString(endDate);
         this.#endDate = endDate;
         this.#internals.setFormValue(`${beginDateStr}/${endDateStr}`);
-        this.dispatchEvent(new PickedDateSetEvent(beginDate, endDate));
+        this.dispatchEvent(new PickedDateSetEvent({
+          beginDate,
+          endDate,
+        }));
       }
     }
   }
@@ -205,6 +271,9 @@ export class DatePickerControlElement extends ContextAwareElement {
     this.#beginDate = beginDate;
     this.#endDate = endDate;
 
-    this.dispatchEvent(new PickedDateSetEvent(beginDate, endDate));
+    this.dispatchEvent(new PickedDateSetEvent({
+      beginDate,
+      endDate,
+    }));
   }
 }

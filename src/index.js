@@ -11,3 +11,5 @@ export { DatePickerInlineElement } from './date-picker-inline-element.js';
 export { DatePickerMonthViewElement } from './date-picker-month-view-element.js';
 export { DatePickerViewElement } from './date-picker-view-element.js';
 export { DatePickerYearViewElement } from './date-picker-year-view-element.js';
+
+export { PickedDateChangeEvent } from './events/picked-date-change-event.js';

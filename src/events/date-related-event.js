@@ -1,10 +1,8 @@
 // @ts-check
 
-/**
- * @typedef {object} DateRelatedEventDetail
- * @property {Date} beginDate
- * @property {Date} endDate
- */
+/** @typedef {import('../tools/date.js').DateRange} DateRange */
+
+/** @typedef {DateRange} DateRelatedEventDetail */
 
 /**
  * @extends {CustomEvent<DateRelatedEventDetail>}
@@ -18,22 +16,20 @@ export class DateRelatedEvent extends CustomEvent {
 
   /**
    * @param {string} type
-   * @param {Date} beginDate
-   * @param {Date} endDate
+   * @param {DateRange} dateRange
    * @param {CustomEventInit<DateRelatedEventDetail>} [options]
    */
-  constructor(type, beginDate, endDate, options) {
+  constructor(type, dateRange, options) {
     super(type, {
       ...options,
       detail: {
         ...options?.detail,
-        beginDate,
-        endDate,
+        ...dateRange,
       },
     });
 
-    this.#beginDate = beginDate;
-    this.#endDate = endDate;
+    this.#beginDate = dateRange.beginDate;
+    this.#endDate = dateRange.endDate;
   }
 
   get beginDate() {

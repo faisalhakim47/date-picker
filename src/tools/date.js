@@ -79,3 +79,18 @@ export function dateToNumber(date) {
 
   return parseInt(dateString.replace(/-/g, ''), 10);
 }
+
+/**
+ * @param {string} dateString
+ * @returns {Date}
+ */
+export function dateStringToDate(dateString) {
+  const [yearStr, monthStr, dateStr] = dateString.split('-');
+
+
+  const year = parseInt(yearStr, 10);
+  const month = parseInt(monthStr, 10);
+  const date = parseInt(dateStr, 10);
+
+  return new Date(year, month - 1, date);
+}

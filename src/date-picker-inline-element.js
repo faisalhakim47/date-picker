@@ -2,9 +2,11 @@
 
 import './date-picker-view.js';
 import { DatePickerControlElement } from './date-picker-control-element.js';
+import { PickedDateChangeEvent } from './events/picked-date-change-event.js';
 import { PickedDateSetEvent } from './events/picked-date-set-event.js';
 import { SelectedDateChangeEvent } from './events/selected-date-change-event.js';
 import { SelectionModeSetEvent } from './events/selection-mode-set-event.js';
+import { dateRangeToString } from './tools/date.js';
 import { at, el } from './tools/dom.js';
 
 export class DatePickerInlineElement extends DatePickerControlElement {
@@ -31,9 +33,6 @@ export class DatePickerInlineElement extends DatePickerControlElement {
 
   #shadowRoot = this.attachShadow({ mode: 'closed' });
 
-  /** @type {HTMLSlotElement} */
-  #datePickerViewSlot;
-
   async connectedCallback() {
     super.connectedCallback();
 
@@ -46,7 +45,10 @@ export class DatePickerInlineElement extends DatePickerControlElement {
     controlCtx.addEventListener(SelectedDateChangeEvent.EVENT_TYPE, this.#handleSelectedDateChange);
   }
 
-  disconnectedCallback() {
+  async disconnectedCallback() {
+    const controlCtx = await this.requireContext(DatePickerControlElement);
+
+    controlCtx.removeEventListener(SelectedDateChangeEvent.EVENT_TYPE, this.#handleSelectedDateChange);
   }
 
   /**
@@ -60,7 +62,10 @@ export class DatePickerInlineElement extends DatePickerControlElement {
 
       const controlCtx = await this.requireContext(DatePickerControlElement);
 
-      controlCtx.dispatchEvent(new PickedDateSetEvent(this.beginDateValue, this.endDateValue));
+      controlCtx.dispatchEvent(new PickedDateSetEvent({
+        beginDate: this.beginDateValue,
+        endDate: this.endDateValue,
+      }));
     }
     else if (name === 'time-unit') {
       this.timeUnit = newValue;
@@ -79,15 +84,21 @@ export class DatePickerInlineElement extends DatePickerControlElement {
    */
   #handleSelectedDateChange = (event) => {
     if (event instanceof SelectedDateChangeEvent) {
-      /**
-       * @todo dispath native change event
-       */
+      this.value = dateRangeToString({
+        beginDate: event.beginDate,
+        endDate: event.endDate,
+      });
+
+      this.dispatchEvent(new PickedDateChangeEvent({
+        beginDate: event.beginDate,
+        endDate: event.endDate,
+      }));
     }
   };
 
   #render() {
     this.#shadowRoot.appendChild(
-      this.#datePickerViewSlot = el('slot', () => [
+      el('slot', () => [
         at('name', 'date-picker-view'),
         el('date-picker-view', () => []),
       ]),

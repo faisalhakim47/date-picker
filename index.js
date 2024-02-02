@@ -1,6 +1,29 @@
 // @ts-check
 
 import './src/index.js';
+import { DatePickerInlineElement, PickedDateChangeEvent } from './src/index.js';
+
+window.addEventListener('load', function () {
+  const form = document.getElementById('datePickerForm');
+
+  if (!(form instanceof HTMLFormElement)) {
+    throw new Error('The element is not an instance of HTMLFormElement.');
+  }
+
+  const inlineSingleDate = form.elements.namedItem('inline-single-date');
+
+  if (!(inlineSingleDate instanceof DatePickerInlineElement)) {
+    throw new Error('The element is not an instance of DatePickerInlineElement.');
+  }
+
+  inlineSingleDate.addEventListener(PickedDateChangeEvent.EVENT_TYPE, function (event) {
+    console.log(PickedDateChangeEvent.name, event);
+  });
+
+  inlineSingleDate.addEventListener('input', function (event) {
+    console.log(event.constructor.name, event);
+  });
+});
 
 // import { DatePickerInlineElement } from './src/index.js';
 
@@ -66,13 +89,13 @@ import './src/index.js';
 // });
 
 
-window.addEventListener('load', function () {
-  const form = document.querySelector('datePickerForm');
+// window.addEventListener('load', function () {
+//   const form = document.querySelector('datePickerForm');
 
-  if (form instanceof HTMLFormElement) {
-    form.addEventListener('submit', function (event) {
-      event.preventDefault();
-      console.log(event);
-    });
-  }
-});
+//   if (form instanceof HTMLFormElement) {
+//     form.addEventListener('submit', function (event) {
+//       event.preventDefault();
+//       console.log(event);
+//     });
+//   }
+// });

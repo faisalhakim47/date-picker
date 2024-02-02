@@ -13,7 +13,7 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  ignorePatterns: ['.eslintrc.cjs'],
+  ignorePatterns: ['.eslintrc.cjs', 'dist'],
   rules: {
     'brace-style': ['error', 'stroustrup'],
     'comma-dangle': ['error', 'always-multiline'],
