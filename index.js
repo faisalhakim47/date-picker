@@ -64,3 +64,15 @@ import './src/index.js';
 //     datePicker.requestSubmit();
 //   });
 // });
+
+
+window.addEventListener('load', function () {
+  const form = document.querySelector('datePickerForm');
+
+  if (form instanceof HTMLFormElement) {
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      console.log(event);
+    });
+  }
+});

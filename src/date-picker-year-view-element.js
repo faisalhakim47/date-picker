@@ -1,6 +1,6 @@
 // @ts-check
 
-import { tx } from './helper.js';
+import { tx } from './tools/dom.js';
 import { ContextAwareElement } from './context-aware-element.js';
 import { YearMonthViewChangeEvent } from './events/year-month-view-change-event.js';
 import { DatePickerViewElement } from './date-picker-view-element.js';

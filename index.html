@@ -20,6 +20,7 @@
             <section>
                 <h2>Inline Date Picker, Single Selection</h2>
                 <date-picker-inline
+                    id="singleDate"
                     name="single-date"
                     selection-mode="single"
                     value="2024-01-05"
@@ -29,8 +30,10 @@
             <section>
                 <h2>Inline Date Picker, Range Selection</h2>
                 <date-picker-inline
+                    id="rangeDates"
                     name="range-dates"
                     selection-mode="range"
+                    value="2024-01-05/2024-01-10"
                 ></date-picker-inline>
             </section>
 
@@ -93,7 +96,7 @@
                     >
                         <button
                             type="submit"
-                            onclick="datePicker.requestSubmit();"
+                            onclick="datePicker.requestSubmit(event);"
                             style="
                                 display: block;
                                 box-sizing: border-box;

@@ -2,9 +2,10 @@
 
 import './date-picker-view.js';
 import { DatePickerControlElement } from './date-picker-control-element.js';
-import { at, el, on, tx } from './helper.js';
+import { at, el, on, tx } from './tools/dom.js';
 import { SelectedDateSetEvent } from './events/selected-date-set-event.js';
 import { DatePickerViewElement } from './date-picker-view-element.js';
+import { isInvalidDate } from './tools/date.js';
 
 export class DatePickerElement extends DatePickerControlElement {
   static #STYLES = (function () {
@@ -97,8 +98,7 @@ dialog > form > slot > div > button {
     if (this.hasAttribute('value')) {
       const value = this.getAttribute('value');
       const dateValue = new Date(value);
-      const isInvalidDate = (value === null || isNaN(dateValue.getTime()));
-      if (isInvalidDate) {
+      if (isInvalidDate(dateValue)) {
         this.value = null;
       }
       else {
@@ -139,17 +139,8 @@ dialog > form > slot > div > button {
     }
   }
 
-  /**
-   * @param {HTMLElement} [submitter]
-   */
-  requestSubmit = (submitter) => {
-    this.#form.requestSubmit(submitter);
-
-    this.value = this.#selectedDate instanceof Date
-      ? this.#selectedDate.toISOString()
-      : null;
-
-    this.#updateButtonText();
+  requestSubmit = () => {
+    this.#form.requestSubmit();
   };
 
   closeDatePicker() {
@@ -212,24 +203,11 @@ dialog > form > slot > div > button {
    * @param {Event} event
    */
   #handleFormSubmit = (event) => {
-    const target = event.target;
+    this.value = this.#selectedDate instanceof Date
+      ? this.#selectedDate.toISOString()
+      : null;
 
-    /** @type {HTMLElement} */
-    let submitButton;
-
-    if (target instanceof HTMLButtonElement) {
-      if (target.type === 'submit') {
-        submitButton = target;
-      }
-    }
-
-    if (target instanceof HTMLInputElement) {
-      if (target.type === 'submit') {
-        submitButton = target;
-      }
-    }
-
-    this.requestSubmit(submitButton);
+    this.#updateButtonText();
   };
 
   #applySelectedDateToDatePickerView() {

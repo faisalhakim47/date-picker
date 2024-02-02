@@ -2,6 +2,7 @@
 
 import { ContextAwareElement } from './context-aware-element.js';
 import { PickedDateSetEvent } from './events/picked-date-set-event.js';
+import { dateToString, isInvalidDate } from './tools/date.js';
 
 // @ts-check
 
@@ -49,6 +50,16 @@ export class DatePickerControlElement extends ContextAwareElement {
 
   /** @type {Date} */
   #endDate;
+
+  connectedCallback() {
+    if (this.hasAttribute('value')) {
+      this.value = this.getAttribute('value');
+    }
+
+    if (this.hasAttribute('selection-mode')) {
+      this.selectionMode = this.getAttribute('selection-mode');
+    }
+  }
 
   get timeUnit() {
     return this.#timeUnit;
@@ -98,24 +109,26 @@ export class DatePickerControlElement extends ContextAwareElement {
       ? new Date(endDateStr)
       : new Date(Infinity);
 
-    const isInvalidBeginDate = (value === null || isNaN(beginDate.getTime()));
-    const isInvalidEndDate = (value === null || isNaN(endDate.getTime()));
+    const isInvalidBeginDate = isInvalidDate(beginDate);
+    const isInvalidEndDate = isInvalidDate(endDate);
 
     if (isInvalidBeginDate) {
       this.#beginDate = null;
+      this.#endDate = null;
       this.#internals.setFormValue(null);
       this.dispatchEvent(new PickedDateSetEvent(null, null));
     }
     else {
-      const beginDateStr = this.#dateStringFormat(beginDate);
+      const beginDateStr = dateToString(beginDate);
       this.#beginDate = beginDate;
 
       if (isInvalidEndDate) {
+        this.#endDate = null;
         this.#internals.setFormValue(beginDateStr);
         this.dispatchEvent(new PickedDateSetEvent(beginDate, null));
       }
       else {
-        const endDateStr = this.#dateStringFormat(endDate);
+        const endDateStr = dateToString(endDate);
         this.#endDate = endDate;
         this.#internals.setFormValue(`${beginDateStr}/${endDateStr}`);
         this.dispatchEvent(new PickedDateSetEvent(beginDate, endDate));
@@ -174,8 +187,8 @@ export class DatePickerControlElement extends ContextAwareElement {
   setDateRangeValues(beginDate, endDate) {
     const beginTime = beginDate.getTime();
     const endTime = endDate.getTime();
-    const isInvalidBeginDate = (beginDate === null || isNaN(beginTime));
-    const isInvalidEndDate = (endDate === null || isNaN(endTime));
+    const isInvalidBeginDate = isInvalidDate(beginDate);
+    const isInvalidEndDate = isInvalidDate(endDate);
 
     if (isInvalidBeginDate) {
       throw new Error('Invalid begin date');
@@ -193,17 +206,5 @@ export class DatePickerControlElement extends ContextAwareElement {
     this.#endDate = endDate;
 
     this.dispatchEvent(new PickedDateSetEvent(beginDate, endDate));
-  }
-
-  /**
-   * @param {Date} date
-   */
-  #dateStringFormat(date) {
-    if (this.#timeUnit === DatePickerControlElement.TIME_UNIT_DAY) {
-      return date.toISOString().split('T')[0];
-    }
-    else {
-      throw new Error('Invalid time unit');
-    }
   }
 }

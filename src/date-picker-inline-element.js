@@ -2,10 +2,9 @@
 
 import './date-picker-view.js';
 import { DatePickerControlElement } from './date-picker-control-element.js';
-import { at, el } from './helper.js';
+import { at, el } from './tools/dom.js';
 import { SelectionModeSetEvent } from './events/selection-mode-set-event.js';
 import { PickedDateSetEvent } from './events/picked-date-set-event.js';
-import { PickedDateChangeEvent } from './events/picked-date-change-event.js';
 import { SelectedDateChangeEvent } from './events/selected-date-change-event.js';
 
 export class DatePickerInlineElement extends DatePickerControlElement {
@@ -36,25 +35,11 @@ export class DatePickerInlineElement extends DatePickerControlElement {
   #datePickerViewSlot;
 
   async connectedCallback() {
+    super.connectedCallback();
+
     this.#shadowRoot.adoptedStyleSheets = DatePickerInlineElement.#STYLES;
 
     this.#render();
-
-    if (this.hasAttribute('value')) {
-      const value = this.getAttribute('value');
-      const dateValue = new Date(value);
-      const isInvalidDate = (value === null || isNaN(dateValue.getTime()));
-      if (isInvalidDate) {
-        this.value = null;
-      }
-      else {
-        this.value = dateValue.toISOString();
-      }
-    }
-
-    if (this.hasAttribute('selection-mode')) {
-      this.selectionMode = this.getAttribute('selection-mode');
-    }
 
     const controlCtx = await this.requireContext(DatePickerControlElement);
 

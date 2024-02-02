@@ -3,11 +3,12 @@
 import { YearMonthViewChangeEvent } from './events/year-month-view-change-event.js';
 import { ContextAwareElement } from './context-aware-element.js';
 import { DatePickerControlElement } from './date-picker-control-element.js';
-import { at, el, on, tx } from './helper.js';
+import { at, el, on, tx } from './tools/dom.js';
 import { CalendarViewChangeEvent } from './events/calendar-view-change-event.js';
 import { SelectionModeSetEvent } from './events/selection-mode-set-event.js';
 import { SelectedDateChangeEvent } from './events/selected-date-change-event.js';
 import { SelectedDateSetEvent } from './events/selected-date-set-event.js';
+import { dateToNumber, dateToString, isInvalidDate } from './tools/date.js';
 
 /** @typedef {import('./date-picker-control-element.js').SelectionMode} SelectionMode */
 
@@ -25,21 +26,24 @@ export class DatePickerViewElement extends ContextAwareElement {
   --si-cell-size: calc(var(--si-width) / 7);
   --si-cell-width: var(--si-cell-size);
   --si-cell-height: var(--si-cell-size);
-  --si-cell-selected-bg-color: lightgoldenrodyellow;
-  --si-cell-selected-text-color: white;
+  --si-cell-bg-color: white;
+  --si-cell-text-color: black;
+  --si-cell-font-weight: normal;
+  --si-cell-selected-bg-color: aliceblue;
+  --si-cell-selected-text-color: black;
   --si-cell-selected-font-weight: bold;
   --si-cell-weekend-text-color: red;
   --si-cell-other-month-text-color: silver;
   --si-cell-other-month-weekend-text-color: tomato;
   --si-cell-font-size: 16px;
-  --si-inner-cell-selected-bg-color: orange;
-  --si-inner-cell-padding: 8px;
+  --si-inner-cell-selected-bg-color: lightblue;
+  --si-inner-cell-padding: 10px;
   --si-inner-cell-size: min(
     calc(var(--si-cell-width) - var(--si-inner-cell-padding)),
     calc(var(--si-cell-height) - var(--si-inner-cell-padding))
   );
   --si-header-height: calc(var(--si-cell-size) - 4px);
-  --si-form-height: calc(
+  --si-section-height: calc(
       var(--si-header-height)
       + var(--si-calendar-label-margin)
       + var(--si-header-height)
@@ -51,11 +55,11 @@ export class DatePickerViewElement extends ContextAwareElement {
       + var(--si-cell-height)
       + var(--si-cell-height)
   );
-  --si-form-width: var(--si-width);
+  --si-section-width: var(--si-width);
   display: block;
   font-family: sans-serif;
   width: var(--si-width);
-  height: var(--si-form-height);
+  height: var(--si-section-height);
 }
 
 .sr-only {
@@ -63,15 +67,15 @@ export class DatePickerViewElement extends ContextAwareElement {
   visibility: hidden;
 }
 
-form {
+section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: var(--si-form-width);
-  height: var(--si-form-height);
+  width: var(--si-section-width);
+  height: var(--si-section-height);
 }
 
-form > header {
+section > header {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -80,13 +84,13 @@ form > header {
   height: var(--si-header-height);
 }
 
-form > header > .year-month-pagination {
+section > header > .year-month-pagination {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-form > header > .year-month-pagination > button {
+section > header > .year-month-pagination > button {
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
@@ -101,13 +105,13 @@ form > header > .year-month-pagination > button {
   background-color: var(--si-button-bg-color, none);
 }
 
-form select[name="month"] {
+section select[name="month"] {
   box-sizing: border-box;
   height: var(--si-header-height);
   padding: 0 8px;
 }
 
-form input[name="year"] {
+section input[name="year"] {
   box-sizing: border-box;
   display: block;
   width: 96px;
@@ -115,22 +119,22 @@ form input[name="year"] {
   padding: 0 8px;
 }
 
-form > table {
+section > table {
   border-collapse: collapse;
   border-spacing: 0;
   width: var(--si-width);
 }
 
-form > table,
-form > table > thead > tr > th,
-form > table > tbody > tr > td {
+section > table,
+section > table > thead > tr > th,
+section > table > tbody > tr > td {
   border: none;
 }
 
-form > table > thead > tr > th,
-form > table > thead > tr > th > span,
-form > table > tbody > tr > td,
-form > table > tbody > tr > td > label {
+section > table > thead > tr > th,
+section > table > thead > tr > th > span,
+section > table > tbody > tr > td,
+section > table > tbody > tr > td > label {
   box-sizing: border-box;
   width: var(--si-cell-width);
   height: var(--si-cell-height);
@@ -139,7 +143,7 @@ form > table > tbody > tr > td > label {
   font-size: var(--si-cell-font-size);
 }
 
-form > table > thead > tr > th > span {
+section > table > thead > tr > th > span {
   -webkit-user-select: none;
   user-select: none;
   display: flex;
@@ -153,7 +157,7 @@ form > table > thead > tr > th > span {
   color: var(--si-calendar-label-text-color);
 }
 
-form > table > tbody > tr > td > label {
+section > table > tbody > tr > td > label {
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
@@ -161,26 +165,26 @@ form > table > tbody > tr > td > label {
   justify-content: center;
 }
 
-form > table > tbody > tr > td > label.range-selected {
+section > table > tbody > tr > td > label.range-selected {
   background-color: var(--si-cell-selected-bg-color);
 }
 
-form > table > tbody > tr > td > label.range-selected-first {
+section > table > tbody > tr > td > label.range-selected-first {
   border-top-left-radius: 50%;
   border-bottom-left-radius: 50%;
 }
 
-form > table > tbody > tr > td > label.range-selected-last {
+section > table > tbody > tr > td > label.range-selected-last {
   border-top-right-radius: 50%;
   border-bottom-right-radius: 50%;
 }
 
-form > table > tbody > tr > td > label > input {
+section > table > tbody > tr > td > label > input {
   display: none;
   visibility: hidden;
 }
 
-form > table > tbody > tr > td > label > span {
+section > table > tbody > tr > td > label > span {
   -webkit-user-select: none;
   user-select: none;
   display: flex;
@@ -192,7 +196,7 @@ form > table > tbody > tr > td > label > span {
   border-radius: 50%;
 }
 
-form > table > tbody > tr > td > label > span > span {
+section > table > tbody > tr > td > label > span > span {
   display: block;
   padding: 0;
   margin: 0;
@@ -200,24 +204,24 @@ form > table > tbody > tr > td > label > span > span {
   line-height: 1;
 }
 
-form > table > tbody > tr > td > label:has(input:checked) > span {
+section > table > tbody > tr > td > label:has(input:checked) > span {
   background-color: var(--si-inner-cell-selected-bg-color);
 }
 
-form > table > tbody > tr > td > label:has(input:checked) > span > span {
+section > table > tbody > tr > td > label:has(input:checked) > span > span {
   color: var(--si-cell-selected-text-color, white);
   font-weight: var(--si-cell-selected-font-weight, bold);
 }
 
-form > table > tbody > tr > td > label.weekend > span > span {
+section > table > tbody > tr > td > label.weekend > span > span {
   color: var(--si-cell-weekend-text-color);
 }
 
-form > table > tbody > tr > td > label.other-month > span > span {
+section > table > tbody > tr > td > label.other-month > span > span {
   color: var(--si-cell-other-month-text-color);
 }
 
-form > table > tbody > tr > td > label.other-month.weekend > span > span {
+section > table > tbody > tr > td > label.other-month.weekend > span > span {
   color: var(--si-cell-other-month-weekend-text-color);
 }
     `);
@@ -290,8 +294,8 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
       : new Date();
 
     this.#setYearMonthView(
-      defaultDate.getFullYear(),
-      defaultDate.getMonth(),
+      defaultDate.getUTCFullYear(),
+      defaultDate.getUTCMonth(),
     );
   }
 
@@ -317,10 +321,10 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
     const formatter = new Intl.DateTimeFormat(this.#locale, { weekday: 'short' });
     const dayIndexes = [...Array(7).keys()];
     const firstDayOfWeekDate = new Date(2000, 0, 1);
-    firstDayOfWeekDate.setDate(firstDayOfWeekDate.getDate() - firstDayOfWeekDate.getDay());
+    firstDayOfWeekDate.setUTCDate(firstDayOfWeekDate.getUTCDate() - firstDayOfWeekDate.getUTCDay());
     return dayIndexes.map((dayIndex) => {
       const date = new Date(firstDayOfWeekDate);
-      date.setDate(date.getDate() + dayIndex);
+      date.setUTCDate(date.getUTCDate() + dayIndex);
       return formatter.format(date);
     });
   }
@@ -337,9 +341,7 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
    * @param {Date} [date]
    */
   setSelectedBeginDate(date) {
-    const isInvalidDate = !(date instanceof Date) || isNaN(date.getTime());
-
-    if (isInvalidDate) {
+    if (isInvalidDate(date)) {
       this.#selectedBeginDate = null;
     }
     else {
@@ -359,9 +361,7 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
       throw new Error('Begin date must be set first');
     }
 
-    const isInvalidDate = !(date instanceof Date) || isNaN(date.getTime());
-
-    if (isInvalidDate) {
+    if (isInvalidDate(date)) {
       this.#selectedEndDate = null;
     }
     else {
@@ -428,11 +428,11 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
 
     const beginOfMonthDate = new Date(year, monthIndex, 1, 0, 0, 0, 0);
     const beginOfWeekOfMonthDate = new Date(beginOfMonthDate);
-    beginOfWeekOfMonthDate.setDate(beginOfWeekOfMonthDate.getDate() - beginOfWeekOfMonthDate.getDay());
+    beginOfWeekOfMonthDate.setUTCDate(beginOfWeekOfMonthDate.getUTCDate() - beginOfWeekOfMonthDate.getUTCDay());
 
     const endOfMonthDate = new Date(year, monthIndex + 1, 0, 0, 0, 0, 0);
     const endOfWeekOfMonthDate = new Date(endOfMonthDate);
-    endOfWeekOfMonthDate.setDate(endOfWeekOfMonthDate.getDate() + (6 - endOfWeekOfMonthDate.getDay()));
+    endOfWeekOfMonthDate.setUTCDate(endOfWeekOfMonthDate.getUTCDate() + (6 - endOfWeekOfMonthDate.getUTCDay()));
 
     let date = new Date(beginOfWeekOfMonthDate);
 
@@ -454,21 +454,21 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
 
     let dayIndex = 0;
 
-    const selectedDateIsoString = this.#selectedBeginDate?.toDateString();
+    const selectedDateIsoString = isInvalidDate(this.#selectedBeginDate) ? null : dateToString(this.#selectedBeginDate);
 
     while (date.getTime() <= endOfWeekOfMonthDate.getTime() || weeksView.length <= 6) {
       const latestWeek = weeksView[weeksView.length - 1];
 
-      const dateDayIndex = date.getDay();
-      const dateMonthIndex = date.getMonth();
-      const dateYear = date.getFullYear();
+      const dateDayIndex = date.getUTCDay();
+      const dateMonthIndex = date.getUTCMonth();
+      const dateYear = date.getUTCFullYear();
 
       const yearViewDiff = (dateYear - this.yearView) * 12;
 
       const isCurrMonth = (yearViewDiff + dateMonthIndex) === this.monthIndexView;
       const isPrevMonth = (yearViewDiff + dateMonthIndex) < this.monthIndexView;
       const isNextMonth = (yearViewDiff + dateMonthIndex) > this.monthIndexView;
-      const isToday = date.toDateString() === selectedDateIsoString;
+      const isToday = dateToString(date) === selectedDateIsoString;
       const isWeekend = dateDayIndex === 0 || dateDayIndex === 6;
       const isDisabled = typeof this.#isDateDisabled === 'function'
         ? this.#isDateDisabled(date)
@@ -476,6 +476,7 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
 
       latestWeek.dates.push({
         date: new Date(date),
+        numericDate: dateToNumber(date),
         isCurrMonth,
         isPrevMonth,
         isNextMonth,
@@ -484,7 +485,7 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
         isDisabled,
       });
 
-      date.setDate(date.getDate() + 1);
+      date.setUTCDate(date.getUTCDate() + 1);
 
       dayIndex++;
 
@@ -586,7 +587,7 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
   };
 
   #render() {
-    this.#shadowRoot.appendChild(el('form', () => [
+    this.#shadowRoot.appendChild(el('section', () => [
       el('header', () => [
         this.#yearMonthControlsSlot = el('slot', () => [
           at('name', 'year-month-controls'),
@@ -728,7 +729,7 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
                 ]),
                 el('span', () => [
                   el('span', () => [
-                    tx(date.date.getDate().toString().padStart(2, '0')),
+                    tx(date.date.getUTCDate().toString().padStart(2, '0')),
                   ]),
                 ]),
               ]),
@@ -747,8 +748,8 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
     const beginDate = this.#selectedBeginDate;
     const endDate = this.#selectedEndDate;
 
-    const beginNumericDate = this.#toNumericDate(beginDate);
-    const endNumericDate = this.#toNumericDate(endDate);
+    const beginNumericDate = dateToNumber(beginDate);
+    const endNumericDate = dateToNumber(endDate);
 
     const isSingleSelect = this.#selectionMode === DatePickerControlElement.SELECTION_MODE_SINGLE;
 
@@ -785,7 +786,7 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
       label.classList.remove('range-selected-last');
 
       const date = new Date(input.value);
-      const numericDate = this.#toNumericDate(date);
+      const numericDate = dateToNumber(date);
 
       const isFirst = numericDate === beginNumericDate;
       const isLast = numericDate === endNumericDate;
@@ -818,18 +819,5 @@ form > table > tbody > tr > td > label.other-month.weekend > span > span {
         label.classList.add('range-selected-last');
       }
     }
-  }
-
-  /**
-   * @param {Date} date
-   */
-  #toNumericDate(date) {
-    const isInvalidDate = !(date instanceof Date) || isNaN(date.getTime());
-
-    if (isInvalidDate) {
-      return 0;
-    }
-
-    return parseInt(`${date.getFullYear()}${date.getMonth().toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`, 10);
   }
 }
