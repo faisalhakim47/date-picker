@@ -3,7 +3,7 @@
 import './date-picker-inline.js';
 import './date-picker-month-view.js';
 import './date-picker-view.js';
-import './date-picker-year-view.js'
+import './date-picker-year-view.js';
 import './date-picker.js';
 
 export { DatePickerElement } from './date-picker-element.js';

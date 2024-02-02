@@ -1,14 +1,14 @@
 // @ts-check
 
-import { YearMonthViewChangeEvent } from './events/year-month-view-change-event.js';
 import { ContextAwareElement } from './context-aware-element.js';
 import { DatePickerControlElement } from './date-picker-control-element.js';
-import { at, el, on, tx } from './tools/dom.js';
 import { CalendarViewChangeEvent } from './events/calendar-view-change-event.js';
-import { SelectionModeSetEvent } from './events/selection-mode-set-event.js';
 import { SelectedDateChangeEvent } from './events/selected-date-change-event.js';
 import { SelectedDateSetEvent } from './events/selected-date-set-event.js';
+import { SelectionModeSetEvent } from './events/selection-mode-set-event.js';
+import { YearMonthViewChangeEvent } from './events/year-month-view-change-event.js';
 import { dateToNumber, dateToString, isInvalidDate } from './tools/date.js';
+import { at, el, on, tx } from './tools/dom.js';
 
 /** @typedef {import('./date-picker-control-element.js').SelectionMode} SelectionMode */
 
@@ -447,9 +447,9 @@ section > table > tbody > tr > td > label.other-month.weekend > span > span {
             isToday: false,
             isWeekend: false,
             isDisabled: false,
-          }
+          },
         ].slice(0, 0),
-      }
+      },
     ];
 
     let dayIndex = 0;

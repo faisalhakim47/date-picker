@@ -2,10 +2,10 @@
 
 import './date-picker-view.js';
 import { DatePickerControlElement } from './date-picker-control-element.js';
-import { at, el, on, tx } from './tools/dom.js';
-import { SelectedDateSetEvent } from './events/selected-date-set-event.js';
 import { DatePickerViewElement } from './date-picker-view-element.js';
+import { SelectedDateSetEvent } from './events/selected-date-set-event.js';
 import { isInvalidDate } from './tools/date.js';
+import { at, el, on, tx } from './tools/dom.js';
 
 export class DatePickerElement extends DatePickerControlElement {
   static #STYLES = (function () {
@@ -233,7 +233,7 @@ dialog > form > slot > div > button {
         }
       }
     }
-  };
+  }
 
   #render() {
     this.#shadowRoot.appendChild(el('div', () => [

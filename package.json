@@ -15,6 +15,8 @@
   "devDependencies": {
     "@web/dev-server": "^0.4.1",
     "esbuild": "^0.20.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-import": "^2.29.1",
     "typescript": "^5.3.3"
   }
 }

@@ -9,7 +9,7 @@ import { dateToString, isInvalidDate } from './tools/date.js';
 /**
  * @typedef {'day'} TimeUnit
  */
-``
+
 /**
  * @typedef {'single'|'range'} SelectionMode
  */

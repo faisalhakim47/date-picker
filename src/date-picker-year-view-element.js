@@ -1,9 +1,9 @@
 // @ts-check
 
-import { tx } from './tools/dom.js';
 import { ContextAwareElement } from './context-aware-element.js';
-import { YearMonthViewChangeEvent } from './events/year-month-view-change-event.js';
 import { DatePickerViewElement } from './date-picker-view-element.js';
+import { YearMonthViewChangeEvent } from './events/year-month-view-change-event.js';
+import { tx } from './tools/dom.js';
 
 export class DatePickerYearViewElement extends ContextAwareElement {
   static get requiredContexts() {
@@ -40,7 +40,7 @@ export class DatePickerYearViewElement extends ContextAwareElement {
     if (event instanceof YearMonthViewChangeEvent) {
       this.#text.nodeValue = event.detail.year.toString();
     }
-  }
+  };
 
   #render() {
     this.#shadowRoot.appendChild(this.#text = tx(''));

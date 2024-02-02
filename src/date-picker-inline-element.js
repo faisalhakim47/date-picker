@@ -2,10 +2,10 @@
 
 import './date-picker-view.js';
 import { DatePickerControlElement } from './date-picker-control-element.js';
-import { at, el } from './tools/dom.js';
-import { SelectionModeSetEvent } from './events/selection-mode-set-event.js';
 import { PickedDateSetEvent } from './events/picked-date-set-event.js';
 import { SelectedDateChangeEvent } from './events/selected-date-change-event.js';
+import { SelectionModeSetEvent } from './events/selection-mode-set-event.js';
+import { at, el } from './tools/dom.js';
 
 export class DatePickerInlineElement extends DatePickerControlElement {
   static #STYLES = (function () {
@@ -86,8 +86,8 @@ export class DatePickerInlineElement extends DatePickerControlElement {
   };
 
   #render() {
-     this.#shadowRoot.appendChild(
-        this.#datePickerViewSlot = el('slot', () => [
+    this.#shadowRoot.appendChild(
+      this.#datePickerViewSlot = el('slot', () => [
         at('name', 'date-picker-view'),
         el('date-picker-view', () => []),
       ]),
