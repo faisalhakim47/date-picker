@@ -1,0 +1,74 @@
+{
+  "version": 1.1,
+  "tags": [
+    {
+      "name": "f-date-picker",
+      "description": "Date Picker Component. Using Dialog.",
+      "attributes": [
+        {
+          "name": "time-unit",
+          "description": "Unit of time",
+          "valueSet": "time-unit"
+        },
+        {
+          "name": "selection-mode",
+          "description": "Selection mode",
+          "valueSet": "selection-mode"
+        },
+        {
+          "name": "value",
+          "description": "'YYYY-MM-DD' format for single mode, YYYY-MM-DD/YYYY-MM-DD format for range mode"
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "f-date-picker-view",
+      "description": "Date Picker Component. Using Dialog.",
+      "attributes": [
+        {
+          "name": "time-unit",
+          "description": "Unit of time",
+          "valueSet": "time-unit"
+        },
+        {
+          "name": "selection-mode",
+          "description": "Selection mode",
+          "valueSet": "selection-mode"
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "f-date-picker-year-view",
+      "description": "Display year View from f-date-picker-view component.",
+      "references": []
+    },
+    {
+      "name": "f-date-picker-month-view",
+      "description": "Display month View from f-date-picker-view component.",
+      "references": []
+    }
+  ],
+  "valueSets": [
+    {
+      "name": "time-unit",
+      "values": [
+        {
+          "name": "day"
+        }
+      ]
+    },
+    {
+      "name": "selection-mode",
+      "values": [
+        {
+          "name": "single"
+        },
+        {
+          "name": "range"
+        }
+      ]
+    }
+  ]
+}

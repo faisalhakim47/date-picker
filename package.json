@@ -1,23 +1,41 @@
 {
-  "name": "range-datetime-picker",
+  "name": "@faisalhakim47/date-picker",
   "version": "1.0.0",
-  "description": "Range Date time picker",
+  "description": "Date Range Picker. Web Components.",
+  "keywords": [
+    "date-picker",
+    "date-range-picker",
+    "web-components"
+  ],
+  "bugs": {
+    "url": "https://github.com/faisalhakim47/date-picker/issues",
+    "email": "faisalhakim47@gmail.com"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Faisal Hakim",
+    "email": "faisalhakim47@gmail.com"
+  },
   "main": "dist/index.js",
-  "type": "module",
+  "browser": "dist/date-picker.js",
+  "module": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/faisalhakim47/date-picker.git"
+  },
   "scripts": {
-    "build": "tsc --project tsconfig.json && esbuild --bundle --minify --sourcemap --format=esm --outfile=dist/index.bundle.min.js dist/index.js",
+    "build": "rm -rf dist && tsc --project tsconfig.json && esbuild --bundle --minify --sourcemap --format=esm --outfile=dist/date-picker.js dist/index.js && cp src/date-picker.d.ts dist/",
     "dev": "web-dev-server",
-    "test": "test",
     "format": "eslint --fix src"
   },
-  "author": "",
-  "license": "ISC",
-  "types": "src/elements.d.ts",
+  "dependencies": {},
   "devDependencies": {
-    "@web/dev-server": "^0.4.1",
+    "@web/dev-server": "^0.4.2",
     "esbuild": "^0.20.0",
     "eslint": "^8.56.0",
     "eslint-plugin-import": "^2.29.1",
     "typescript": "^5.3.3"
-  }
+  },
+  "types": "src/index.d.ts",
+  "type": "module"
 }

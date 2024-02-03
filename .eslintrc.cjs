@@ -22,7 +22,7 @@ module.exports = {
     'no-unused-vars': ['off'],
     'quote-props': ['error', 'consistent-as-needed'],
     'quotes': ['error', 'single'],
-    'semi': ['error','always'],
+    'semi': ['error', 'always'],
     'import/order': [
       'error',
       {

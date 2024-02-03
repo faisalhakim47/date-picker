@@ -1,0 +1,1 @@
+{"version":3,"file":"calendar-view-change-event.js","sourceRoot":"","sources":["../../src/events/calendar-view-change-event.js"],"names":[],"mappings":"AAAA,YAAY;AAEZ;;GAEG;AAEH;;GAEG;AACH,MAAM,OAAO,uBAAwB,SAAQ,WAAW;IACtD,MAAM,KAAK,UAAU;QACnB,OAAO,sBAAsB,CAAC;IAChC,CAAC;IAED;;OAEG;IACH,YAAY,OAAO;QACjB,KAAK,CAAC,uBAAuB,CAAC,UAAU,EAAE,OAAO,CAAC,CAAC;IACrD,CAAC;CACF"}

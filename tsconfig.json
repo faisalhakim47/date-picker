@@ -1,20 +1,20 @@
 {
-    "compilerOptions": {
-        "allowJs": true,
-        "checkJs": true,
-        "declaration": true,
-        "outDir": "dist",
-        "module": "NodeNext",
-        "target": "ES2022",
-        "moduleResolution": "NodeNext",
-        "sourceMap": true,
-        "lib": [
-            "DOM",
-            "DOM.Iterable",
-            "ES2022"
-        ]
-    },
-    "include": [
-        "src/**/*",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": true,
+    "outDir": "dist",
+    "module": "NodeNext",
+    "target": "ES2022",
+    "moduleResolution": "NodeNext",
+    "sourceMap": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2022"
     ]
+  },
+  "include": [
+    "src/**/*",
+  ]
 }

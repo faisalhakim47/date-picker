@@ -1,7 +1,7 @@
 // @ts-check
 
 import './src/index.js';
-import { DatePickerElement, DatePickerInlineElement, PickedDateChangeEvent } from './src/index.js';
+import { DatePickerDialogElement, DatePickerInlineElement, PickedDateChangeEvent } from './src/index.js';
 
 window.addEventListener('load', function () {
   const form = document.getElementById('datePickerForm');
@@ -26,7 +26,7 @@ window.addEventListener('load', function () {
 
   const oeypayDate = form.elements.namedItem('oeypay-date');
 
-  if (!(oeypayDate instanceof DatePickerElement)) {
+  if (!(oeypayDate instanceof DatePickerDialogElement)) {
     throw new Error('The element is not an instance of DatePickerElement.');
   }
 
