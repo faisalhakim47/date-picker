@@ -1,6 +1,6 @@
 {
   "name": "@faisalhakim47/date-picker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Date Range Picker. Web Components.",
   "keywords": [
     "date-picker",
@@ -16,9 +16,9 @@
     "name": "Faisal Hakim",
     "email": "faisalhakim47@gmail.com"
   },
-  "main": "dist/index.js",
+  "main": "dist/date-picker.js",
   "browser": "dist/date-picker.js",
-  "module": "dist/index.js",
+  "module": "dist/date-picker.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/faisalhakim47/date-picker.git"
