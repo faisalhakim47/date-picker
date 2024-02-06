@@ -10,6 +10,8 @@
  */
 export function dateRangeToString({ beginDate, endDate }: DateRange): string;
 /**
+ * Locale date string
+ *
  * @param {Date} date
  * @returns {string}
  */

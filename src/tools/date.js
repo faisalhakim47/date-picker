@@ -24,6 +24,8 @@ export function dateRangeToString({ beginDate, endDate }) {
 }
 
 /**
+ * Locale date string
+ * 
  * @param {Date} date
  * @returns {string}
  */
@@ -32,10 +34,11 @@ export function dateToString(date) {
     return '';
   }
 
-  const fullIsoString = date.toISOString();
-  const dateIsoString = fullIsoString.split('T')[0];
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
 
-  return dateIsoString;
+  return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
 }
 
 /**

@@ -295,8 +295,8 @@ section > table > tbody > tr > td > label.other-month.weekend > span > span {
       : new Date();
 
     this.#setYearMonthView(
-      defaultDate.getUTCFullYear(),
-      defaultDate.getUTCMonth(),
+      defaultDate.getFullYear(),
+      defaultDate.getMonth(),
     );
   }
 
@@ -322,10 +322,10 @@ section > table > tbody > tr > td > label.other-month.weekend > span > span {
     const formatter = new Intl.DateTimeFormat(this.#locale, { weekday: 'short' });
     const dayIndexes = [...Array(7).keys()];
     const firstDayOfWeekDate = new Date(2000, 0, 1);
-    firstDayOfWeekDate.setUTCDate(firstDayOfWeekDate.getUTCDate() - firstDayOfWeekDate.getUTCDay());
+    firstDayOfWeekDate.setDate(firstDayOfWeekDate.getDate() - firstDayOfWeekDate.getDay());
     return dayIndexes.map((dayIndex) => {
       const date = new Date(firstDayOfWeekDate);
-      date.setUTCDate(date.getUTCDate() + dayIndex);
+      date.setDate(date.getDate() + dayIndex);
       return formatter.format(date);
     });
   }
@@ -429,11 +429,11 @@ section > table > tbody > tr > td > label.other-month.weekend > span > span {
 
     const beginOfMonthDate = new Date(year, monthIndex, 1, 0, 0, 0, 0);
     const beginOfWeekOfMonthDate = new Date(beginOfMonthDate);
-    beginOfWeekOfMonthDate.setUTCDate(beginOfWeekOfMonthDate.getUTCDate() - beginOfWeekOfMonthDate.getUTCDay());
+    beginOfWeekOfMonthDate.setDate(beginOfWeekOfMonthDate.getDate() - beginOfWeekOfMonthDate.getDay());
 
     const endOfMonthDate = new Date(year, monthIndex + 1, 0, 0, 0, 0, 0);
     const endOfWeekOfMonthDate = new Date(endOfMonthDate);
-    endOfWeekOfMonthDate.setUTCDate(endOfWeekOfMonthDate.getUTCDate() + (6 - endOfWeekOfMonthDate.getUTCDay()));
+    endOfWeekOfMonthDate.setDate(endOfWeekOfMonthDate.getDate() + (6 - endOfWeekOfMonthDate.getDay()));
 
     let date = new Date(beginOfWeekOfMonthDate);
 
@@ -455,21 +455,21 @@ section > table > tbody > tr > td > label.other-month.weekend > span > span {
 
     let dayIndex = 0;
 
-    const selectedDateIsoString = isInvalidDate(this.#selectedBeginDate) ? null : dateToString(this.#selectedBeginDate);
+    const selectedDateString = isInvalidDate(this.#selectedBeginDate) ? null : dateToString(this.#selectedBeginDate);
 
     while (date.getTime() <= endOfWeekOfMonthDate.getTime() || weeksView.length <= 6) {
       const latestWeek = weeksView[weeksView.length - 1];
 
-      const dateDayIndex = date.getUTCDay();
-      const dateMonthIndex = date.getUTCMonth();
-      const dateYear = date.getUTCFullYear();
+      const dateDayIndex = date.getDay();
+      const dateMonthIndex = date.getMonth();
+      const dateYear = date.getFullYear();
 
       const yearViewDiff = (dateYear - this.yearView) * 12;
 
       const isCurrMonth = (yearViewDiff + dateMonthIndex) === this.monthIndexView;
       const isPrevMonth = (yearViewDiff + dateMonthIndex) < this.monthIndexView;
       const isNextMonth = (yearViewDiff + dateMonthIndex) > this.monthIndexView;
-      const isToday = dateToString(date) === selectedDateIsoString;
+      const isToday = dateToString(date) === selectedDateString;
       const isWeekend = dateDayIndex === 0 || dateDayIndex === 6;
       const isDisabled = typeof this.#isDateDisabled === 'function'
         ? this.#isDateDisabled(date)
@@ -486,7 +486,7 @@ section > table > tbody > tr > td > label.other-month.weekend > span > span {
         isDisabled,
       });
 
-      date.setUTCDate(date.getUTCDate() + 1);
+      date.setDate(date.getDate() + 1);
 
       dayIndex++;
 
@@ -776,7 +776,7 @@ section > table > tbody > tr > td > label.other-month.weekend > span > span {
                 ]),
                 el('span', () => [
                   el('span', () => [
-                    tx(date.date.getUTCDate().toString().padStart(2, '0')),
+                    tx(date.date.getDate().toString().padStart(2, '0')),
                   ]),
                 ]),
               ]),
