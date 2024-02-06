@@ -141,6 +141,10 @@ dialog > form > slot > div > button {
     this.#form.requestSubmit();
   };
 
+  openDatePicker() {
+    this.#openDatePicker();
+  }
+
   closeDatePicker() {
     this.#closeDatePicker();
   }

@@ -10,6 +10,7 @@ export class DatePickerDialogElement extends DatePickerControlElement {
      */
     attributeChangedCallback(name: string, oldValue: string, newValue: string): void;
     requestSubmit: () => void;
+    openDatePicker(): void;
     closeDatePicker(): void;
     #private;
 }
