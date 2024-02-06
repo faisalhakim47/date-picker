@@ -167,8 +167,8 @@ dialog > form > slot > div > button {
       const controlCtx = await this.requireContext(DatePickerControlElement);
 
       controlCtx.dispatchEvent(new SelectedDateSetEvent({
-        beginDate: this.#selectedBeginDate,
-        endDate: this.#selectedEndDate,
+        beginDate: this.beginDateValue,
+        endDate: this.endDateValue,
       }));
 
       this.#dialog.showModal();
