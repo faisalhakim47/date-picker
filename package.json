@@ -1,6 +1,6 @@
 {
   "name": "@faisalhakim47/date-picker",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Date Range Picker. Web Components.",
   "keywords": [
     "date-picker",
@@ -24,16 +24,17 @@
     "url": "https://github.com/faisalhakim47/date-picker.git"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc --project tsconfig.json && esbuild --bundle --sourcemap --format=esm --target=es2022 --outfile=dist/date-picker.js dist/index.js && cp src/date-picker.d.ts dist/",
+    "build": "rm -rf dist && tsc --project tsconfig.json && rollup --config",
     "dev": "web-dev-server",
     "format": "eslint --fix src"
   },
-  "dependencies": {},
   "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
     "@web/dev-server": "^0.4.2",
     "esbuild": "^0.20.0",
     "eslint": "^8.56.0",
     "eslint-plugin-import": "^2.29.1",
+    "rollup": "^4.9.6",
     "typescript": "^5.3.3"
   },
   "private": false,

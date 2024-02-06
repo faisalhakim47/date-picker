@@ -7,7 +7,9 @@ export class ContextAwareElement extends HTMLElement {
      *
      * @template {ContextAwareElement} T
      * @param {new () => T} constructor
+     * @param {number} [checkingInterval]
      * @returns {Promise<T>}
      */
-    requireContext<T extends ContextAwareElement>(constructor: new () => T): Promise<T>;
+    requireContext<T extends ContextAwareElement>(constructor: new () => T, checkingInterval?: number): Promise<T>;
+    #private;
 }

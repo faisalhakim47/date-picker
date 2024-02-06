@@ -10,8 +10,8 @@ export class DatePickerControlElement extends ContextAwareElement {
     static SELECTION_MODE_SINGLE: SelectionMode;
     /** @type {SelectionMode} */
     static SELECTION_MODE_RANGE: SelectionMode;
-    static "__#4@#AVAILABLE_TIME_UNITS": "day"[];
-    static "__#4@#AVAILABLE_SELECTION_MODES": import("../events/selection-mode-set-event.js").SelectionMode[];
+    static "__#5@#AVAILABLE_TIME_UNITS": "day"[];
+    static "__#5@#AVAILABLE_SELECTION_MODES": import("../events/selection-mode-set-event.js").SelectionMode[];
     connectedCallback(): void;
     /**
      * @param {string} value

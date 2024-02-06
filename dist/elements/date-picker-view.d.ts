@@ -1,7 +1,7 @@
 /** @typedef {import('./date-picker-control.js').SelectionMode} SelectionMode */
 export class DatePickerViewElement extends ContextAwareElement {
-    static "__#5@#ID_INC": number;
-    static "__#5@#STYLES": CSSStyleSheet[];
+    static "__#6@#ID_INC": number;
+    static "__#6@#STYLES": CSSStyleSheet[];
     static get observedAttributes(): string[];
     connectedCallback(): Promise<void>;
     disconnectedCallback(): Promise<void>;

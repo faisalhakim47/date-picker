@@ -9,32 +9,58 @@ export class ContextAwareElement extends HTMLElement {
    *
    * @template {ContextAwareElement} T
    * @param {new () => T} constructor
+   * @param {number} [checkingInterval]
    * @returns {Promise<T>}
    */
-  async requireContext(constructor) {
-    return new Promise((resolve, reject) => {
+  async requireContext(constructor, checkingInterval = 50) {
+    return new Promise((resolve) => {
       setTimeout(() => {
-        /** @type {Node} */
-        let element = this;
-
-        while (element instanceof Node) {
-          if (element instanceof constructor) {
-            resolve(element);
-            return;
-          }
-
-          if (element instanceof ShadowRoot) {
-            element = element.host;
-          }
-          else {
-            element = element.parentNode;
-          }
+        const context = this.#traceContext(constructor);
+        if (context instanceof constructor) {
+          resolve(context);
         }
-
-        console.warn(`Context ${constructor.name} not found`);
-
-        reject(new Error(`Context ${constructor.name} not found`));
+        else {
+          const timeThreshold = 5000;
+          const retryThreshold = timeThreshold / checkingInterval;
+          let numOfRetries = 0;
+          const interval = setInterval(() => {
+            const context = this.#traceContext(constructor);
+            if (context instanceof constructor) {
+              clearInterval(interval);
+              resolve(context);
+            }
+            else if (numOfRetries > retryThreshold) {
+              clearInterval(interval);
+              throw new Error(`Failed to find the context of ${constructor.name} after ${retryThreshold * checkingInterval}ms`);
+            }
+            else {
+              numOfRetries++;
+            }
+          }, checkingInterval);
+        }
       });
     });
+  }
+
+  /**
+   * @template {ContextAwareElement} T
+   * @param {new () => T} constructor
+   * @returns {T}
+   */
+  #traceContext(constructor) {
+    /** @type {Node} */
+    let element = this;
+    while (element) {
+      if (element instanceof constructor) {
+        return element;
+      }
+      if (element instanceof ShadowRoot) {
+        element = element.host;
+      }
+      else {
+        element = element.parentNode;
+      }
+    }
+    return null;
   }
 }
