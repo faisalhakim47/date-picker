@@ -36,6 +36,11 @@ export class DatePickerControlElement extends ContextAwareElement {
     get validity(): ValidityState;
     get validationMessage(): string;
     get willValidate(): boolean;
+    /**
+     * @param {Date} beginDate when selectionMode is single, this is the selected date
+     * @param {Date} [endDate] only used when selectionMode is range
+     */
+    setDateValue(beginDate: Date, endDate?: Date): void;
     checkValidity(): boolean;
     reportValidity(): boolean;
     #private;

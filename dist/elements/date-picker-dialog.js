@@ -1,9 +1,9 @@
 // @ts-check
 import '../components/f-date-picker-view.js';
-import { PickedDateChangeEvent } from '../events/picked-date-change-event.js';
 import { PickedDateSetEvent } from '../events/picked-date-set-event.js';
 import { SelectedDateChangeEvent } from '../events/selected-date-change-event.js';
 import { SelectedDateSetEvent } from '../events/selected-date-set-event.js';
+import { PickedDateChangeEvent } from '../index.js';
 import { dateRangeToString, dateToString } from '../tools/date.js';
 import { at, el, on, tx } from '../tools/dom.js';
 import { DatePickerControlElement } from './date-picker-control.js';
@@ -16,6 +16,7 @@ export class DatePickerDialogElement extends DatePickerControlElement {
   --si-submit-button-height: 36px;
   --si-dialog-radius: 4px;
   --si-dialog-padding: 16px;
+  --si-dialog-box-shadow: none;
 }
 button {
   display: block;
@@ -26,6 +27,7 @@ dialog {
   border: none;
   padding: var(--si-dialog-padding);
   border-radius: var(--si-dialog-radius);
+  box-shadow: var(--si-dialog-box-shadow);
 }
 dialog > form > slot > div {
   display: flex;
@@ -63,7 +65,6 @@ dialog > form > slot > div > button {
     #selectedEndDate;
     async connectedCallback() {
         const controlCtx = await this.requireContext(DatePickerControlElement);
-        controlCtx.addEventListener(PickedDateChangeEvent.EVENT_TYPE, this.#handlePickedDateChange);
         controlCtx.addEventListener(PickedDateSetEvent.EVENT_TYPE, this.#handlePickedDateSet);
         controlCtx.addEventListener(SelectedDateChangeEvent.EVENT_TYPE, this.#handleSelectedDateChange);
         super.connectedCallback();
@@ -83,7 +84,6 @@ dialog > form > slot > div > button {
         this.#dialog.removeEventListener('open', this.#handleDialogOpen);
         this.#dialog.removeEventListener('close', this.#handleDialogClose);
         const controlCtx = await this.requireContext(DatePickerControlElement);
-        controlCtx.removeEventListener(PickedDateChangeEvent.EVENT_TYPE, this.#handlePickedDateChange);
         controlCtx.removeEventListener(PickedDateSetEvent.EVENT_TYPE, this.#handlePickedDateSet);
         controlCtx.removeEventListener(SelectedDateChangeEvent.EVENT_TYPE, this.#handleSelectedDateChange);
     }
@@ -111,9 +111,12 @@ dialog > form > slot > div > button {
             this.#updateButtonText();
         }
     }
-    requestSubmit = () => {
+    requestSubmit() {
+        console.trace('requestSubmit', [
+            this.#form,
+        ]);
         this.#form.requestSubmit();
-    };
+    }
     openDatePicker() {
         this.#openDatePicker();
     }
@@ -163,33 +166,31 @@ dialog > form > slot > div > button {
     /**
      * @param {Event} event
      */
-    #handleSelectedDateChange = (event) => {
+    #handleSelectedDateChange = async (event) => {
         if (event instanceof SelectedDateChangeEvent) {
             const { beginDate, endDate } = event.detail;
             this.#selectedBeginDate = beginDate;
             this.#selectedEndDate = endDate;
+            const controlCtx = await this.requireContext(DatePickerControlElement);
+            controlCtx.dispatchEvent(new SelectedDateSetEvent(event.detail));
         }
     };
     /**
      * @param {Event} event
      */
-    #handlePickedDateChange = (event) => {
-        if (event instanceof PickedDateChangeEvent) {
-            this.#updateButtonText();
-        }
-    };
-    /**
-     * @param {Event} event
-     */
-    #handlePickedDateSet = (event) => {
+    #handlePickedDateSet = async (event) => {
         if (event instanceof PickedDateSetEvent) {
-            const { beginDate, endDate } = event.detail;
-            this.#selectedBeginDate = beginDate;
-            this.#selectedEndDate = endDate;
+            this.setDateValue(event.detail.beginDate, event.detail.endDate);
+            const controlCtx = await this.requireContext(DatePickerControlElement);
+            controlCtx.dispatchEvent(new SelectedDateSetEvent(event.detail));
             this.#updateButtonText();
         }
     };
-    #handleFormSubmit = () => {
+    #handleFormSubmit = async () => {
+        console.trace('#handleFormSubmit', {
+            selectedBeginDate: this.#selectedBeginDate,
+            selectedEndDate: this.#selectedEndDate,
+        });
         if (this.selectionMode === DatePickerControlElement.SELECTION_MODE_SINGLE) {
             this.value = dateToString(this.#selectedBeginDate);
         }
@@ -202,6 +203,15 @@ dialog > form > slot > div > button {
         else {
             throw new Error('Invalid selection mode');
         }
+        const controlCtx = await this.requireContext(DatePickerControlElement);
+        controlCtx.dispatchEvent(new SelectedDateSetEvent({
+            beginDate: this.#selectedBeginDate,
+            endDate: this.#selectedEndDate,
+        }));
+        controlCtx.dispatchEvent(new PickedDateChangeEvent({
+            beginDate: this.#selectedBeginDate,
+            endDate: this.#selectedEndDate,
+        }));
         this.#updateButtonText();
     };
     #render() {

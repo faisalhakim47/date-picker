@@ -1,6 +1,8 @@
 export class DatePickerInlineElement extends DatePickerControlElement {
-    static "__#7@#STYLES": CSSStyleSheet[];
+    static "__#10@#STYLES": CSSStyleSheet[];
     static get observedAttributes(): string[];
+    connectedCallback(): Promise<void>;
+    disconnectedCallback(): Promise<void>;
     /**
      * @param {string} name
      * @param {string} oldValue
