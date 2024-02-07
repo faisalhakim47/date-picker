@@ -112,9 +112,6 @@ dialog > form > slot > div > button {
         }
     }
     requestSubmit() {
-        console.trace('requestSubmit', [
-            this.#form,
-        ]);
         this.#form.requestSubmit();
     }
     openDatePicker() {
@@ -187,10 +184,6 @@ dialog > form > slot > div > button {
         }
     };
     #handleFormSubmit = async () => {
-        console.trace('#handleFormSubmit', {
-            selectedBeginDate: this.#selectedBeginDate,
-            selectedEndDate: this.#selectedEndDate,
-        });
         if (this.selectionMode === DatePickerControlElement.SELECTION_MODE_SINGLE) {
             this.value = dateToString(this.#selectedBeginDate);
         }
